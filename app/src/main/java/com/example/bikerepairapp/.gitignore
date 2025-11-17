@@ -1,0 +1,23 @@
+# Ignore Android Studio files
+.idea/
+.gradle/
+local.properties
+
+# Ignore build files
+*/build/
+*/captures/
+
+# Secure / environment files
+keystores/
+*.keystore
+*.jks
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Log files
+*.log
+
+# Kotlin/Java specific
+*.iml

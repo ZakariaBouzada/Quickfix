@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">My Application</string>
+    <string name="booking_status_title">Booking Status Screen</string>
+    <string name="welcome_message">Welcome to BikeRepairApp!</string>
+    <string name="Book_repair_message">Book a Repair</string>
+    <string name="test_firebase">Test Firebase</string>
 </resources>

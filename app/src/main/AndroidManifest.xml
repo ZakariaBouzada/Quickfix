@@ -11,15 +11,21 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
+
+        <!-- NEW: Login is the launcher -->
         <activity
-            android:name=".BIkeRepairApp"
+            android:name=".LoginActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <!-- Your existing main app activity (no launcher filter) -->
+        <activity
+            android:name=".BIkeRepairApp"
+            android:exported="false" />
     </application>
 
 </manifest>

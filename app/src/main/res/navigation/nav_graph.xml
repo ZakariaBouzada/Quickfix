@@ -17,4 +17,9 @@
         android:id="@+id/profileFragment"
         android:name="com.example.bikerepairapp.ui.profile.ProfileFragment"
         android:label="Profile" />
+    <fragment
+        android:id="@+id/statusFragment"
+        android:name="com.example.bikerepairapp.ui.status.StatusFragment"
+        android:label="Status" />
+
 </navigation>

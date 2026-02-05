@@ -32,6 +32,12 @@ android {
 }
 
 dependencies {
+    implementation("com.github.timonknispel:KTLoadingButton:1.2.0")
+    implementation("com.github.flavienlaurent.discrollview:library:0.0.2@aar")
+    implementation("info.hoang8f:fbutton:1.0.5")
+    implementation("com.github.dmytrodanylyk:circular-progress-button:1.4")
+
+
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

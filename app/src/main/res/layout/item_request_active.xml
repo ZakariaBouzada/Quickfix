@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="0dp"
+    app:strokeColor="#2A2A2A"
+    app:strokeWidth="1dp"
+    app:cardBackgroundColor="#101010">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp">
+
+        <TextView
+            android:id="@+id/tvIssue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Flat tire"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:textColor="#FFFFFF"
+            android:includeFontPadding="false" />
+
+        <TextView
+            android:id="@+id/tvMeta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:text="13.11 · Uudenmaa"
+            android:textColor="#BDBDBD"
+            android:textSize="12sp"
+            android:includeFontPadding="false"
+            android:maxLines="2"
+            android:ellipsize="end" />
+
+        <!-- Status hint (optional, only shown when completed) -->
+        <TextView
+            android:id="@+id/tvStatusHint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="Waiting for customer confirmation…"
+            android:textColor="#8A8A8A"
+            android:textSize="12sp"
+            android:includeFontPadding="false"
+            android:visibility="gone" />
+
+        <!-- Actions -->
+        <LinearLayout
+            android:id="@+id/actionsRow"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal">
+
+            <!-- NEW: complete -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnComplete"
+                android:layout_width="0dp"
+                android:layout_height="42dp"
+                android:layout_weight="1"
+                android:text="Repair completed"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                app:cornerRadius="12dp"
+                app:backgroundTint="#FFFF00"
+                app:strokeWidth="0dp"
+                app:rippleColor="#22000000" />
+
+            <View
+                android:layout_width="10dp"
+                android:layout_height="1dp" />
+
+            <!-- KEEP: release (same id as before) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnRelease"
+                android:layout_width="0dp"
+                android:layout_height="42dp"
+                android:layout_weight="1"
+                android:text="Release"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                app:cornerRadius="12dp"
+                app:backgroundTint="#202020"
+                app:strokeColor="#2A2A2A"
+                app:strokeWidth="1dp"
+                app:rippleColor="#22FFFF00" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</com.google.android.material.card.MaterialCardView>

@@ -21,3 +21,6 @@ Thumbs.db
 
 # Kotlin/Java specific
 *.iml
+
+# Firebase config
+app/google-services.json

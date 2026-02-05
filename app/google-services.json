@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "727173298922",
+    "project_id": "quickfix-c6a88",
+    "storage_bucket": "quickfix-c6a88.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:727173298922:android:391a32a0cdeec7ff617593",
+        "android_client_info": {
+          "package_name": "com.example.bikerepairapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCIk6PYv2w368NG881CxuIw2b-c2oNMkBo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

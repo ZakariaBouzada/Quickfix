@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- ONLY for the selected item -->
+    <item android:state_checked="true">
+        <inset
+            android:insetLeft="20dp"
+            android:insetRight="20dp"
+            android:insetTop="8dp"
+            android:insetBottom="8dp">
+
+            <shape>
+                <solid android:color="#E9E3FF"/>
+                <corners android:radius="999dp"/>
+            </shape>
+
+        </inset>
+    </item>
+
+    <!-- For non-selected items: fully transparent -->
+    <item android:drawable="@android:color/transparent"/>
+
+</selector>

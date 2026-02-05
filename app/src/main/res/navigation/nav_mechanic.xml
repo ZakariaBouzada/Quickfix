@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_mechanic"
+    app:startDestination="@id/mechanicHomeFragment">
+
+    <!-- your existing home -->
+    <fragment
+        android:id="@+id/mechanicHomeFragment"
+        android:name="com.example.bikerepairapp.ui.mechanic.MechanicHomeFragment"
+        android:label="Home" />
+
+    <!-- your existing requests -->
+    <fragment
+        android:id="@+id/mechanicRequestsFragment"
+        android:name="com.example.bikerepairapp.ui.mechanic.MechanicRequestsFragment"
+        android:label="Requests" />
+
+    <!-- NEW: mechanic profile (replaces customer profile for mechanic flow) -->
+    <fragment
+        android:id="@+id/mechanicProfileFragment"
+        android:name="com.example.bikerepairapp.ui.mechanic.MechanicProfileFragment"
+        android:label="Profile">
+
+        <!-- navigation from button -->
+        <action
+            android:id="@+id/action_mechanicProfileFragment_to_mechanicCompletedFragment"
+            app:destination="@id/mechanicCompletedFragment" />
+    </fragment>
+
+    <!-- NEW: completed list -->
+    <fragment
+        android:id="@+id/mechanicCompletedFragment"
+        android:name="com.example.bikerepairapp.ui.mechanic.MechanicCompletedFragment"
+        android:label="Completed" />
+
+</navigation>

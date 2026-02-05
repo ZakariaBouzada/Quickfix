@@ -1,25 +1,312 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<com.flavienlaurent.discrollview.lib.DiscrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:discrollve="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="16dp">
+    android:background="#000000">
 
-    <TextView
-        android:id="@+id/tvWelcome"
-        android:layout_width="wrap_content"
+    <!-- DiscrollView MUST host exactly one DiscrollViewContent -->
+    <com.flavienlaurent.discrollview.lib.DiscrollViewContent
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Welcome to BikeRepairApp!"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/black" />
+        android:padding="16dp"
+        android:background="@drawable/bg_home_panel">
 
-    <Button
-        android:id="@+id/btnBook"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Book a Repair"
-        android:layout_marginTop="24dp" />
-</LinearLayout>
+        <!-- ✅ CHILD #1 -->
+        <LinearLayout
+            android:id="@+id/heroGroup"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp">
+
+            <!-- Keep ID (if old code references it), but hide -->
+            <TextView
+                android:id="@+id/tvHomeTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="QuickFix"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:textColor="#FFFF00"
+                android:gravity="center"
+                android:visibility="gone" />
+
+            <!-- ✅ Logo pill with background photo + border line -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardLogo"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                app:cardCornerRadius="32dp"
+                app:cardElevation="0dp"
+                app:cardUseCompatPadding="false"
+                android:clipToOutline="true"
+                app:strokeWidth="2dp"
+                app:strokeColor="#2A2A2A">
+
+                <!-- Stack: bg image -> white overlay -> content -->
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="92dp">
+
+                    <!-- Background image inside pill -->
+                    <ImageView
+                        android:id="@+id/ivPillBg"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/home_bike_hero"
+                        android:scaleType="centerCrop"
+                        android:alpha="0.95"
+                        android:contentDescription="@null" />
+
+                    <!-- White overlay (controls readability) -->
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="#99FFFFFF" />
+
+                    <!-- Foreground: logo left + text right -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp">
+
+                        <ImageView
+                            android:id="@+id/ivHomeLogo"
+                            android:layout_width="84dp"
+                            android:layout_height="match_parent"
+                            android:src="@drawable/quickfix_logo"
+                            android:contentDescription="@null"
+                            android:scaleType="centerInside"
+                            android:paddingTop="6dp"
+                            android:paddingBottom="6dp"
+                            android:scaleX="1.35"
+                            android:scaleY="1.35" />
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_marginStart="12dp"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/tvTaglineInPill"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="On-demand bike repair in Turku."
+                                android:textSize="13sp"
+                                android:textColor="#222222"
+                                android:maxLines="2"
+                                android:ellipsize="end" />
+                        </LinearLayout>
+
+                    </LinearLayout>
+                </FrameLayout>
+
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnHomeBookNow"
+                android:layout_width="wrap_content"
+                android:layout_height="44dp"
+                android:layout_marginTop="16dp"
+                android:text="Book a repair"
+                android:textAllCaps="false"
+                android:textStyle="bold"
+                android:textColor="#000000"
+                app:cornerRadius="14dp"
+                app:backgroundTint="#FFFF00" />
+        </LinearLayout>
+
+        <!-- ✅ CHILD #2+ (these can animate) -->
+
+        <TextView
+            android:id="@+id/tvHowItWorks"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp"
+            android:text="How does it work?"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            discrollve:discrollve_alpha="true"
+            discrollve:discrollve_translation="fromBottom"
+            discrollve:discrollve_threshold="0.05" />
+
+        <!-- CARD 1 -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#2A2A2A"
+            app:cardBackgroundColor="#101010"
+            discrollve:discrollve_alpha="true"
+            discrollve:discrollve_translation="fromRight"
+            discrollve:discrollve_scaleX="true"
+            discrollve:discrollve_scaleY="true"
+            discrollve:discrollve_threshold="0.10">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/home_request"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop"
+                    android:layout_marginEnd="14dp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Request a repair"
+                        android:textColor="#FFFF00"
+                        android:textStyle="bold"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="Describe the problem, pick time and location in Turku – all from one screen."
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- CARD 2 -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#2A2A2A"
+            app:cardBackgroundColor="#101010"
+            discrollve:discrollve_alpha="true"
+            discrollve:discrollve_translation="fromLeft"
+            discrollve:discrollve_scaleX="true"
+            discrollve:discrollve_scaleY="true"
+            discrollve:discrollve_threshold="0.18">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="16dp"
+                android:gravity="center_vertical">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Mechanic on the way"
+                        android:textColor="#FFFF00"
+                        android:textStyle="bold"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="6dp"
+                        android:text="A nearby mechanic accepts your request and comes to your location."
+                        android:textColor="#FFFFFF" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/home_mechanic"
+                    android:contentDescription="@null"
+                    android:scaleType="centerCrop"
+                    android:layout_marginStart="14dp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- CARD 3 -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#2A2A2A"
+            app:cardBackgroundColor="#101010"
+            discrollve:discrollve_alpha="true"
+            discrollve:discrollve_translation="fromBottom"
+            discrollve:discrollve_scaleX="true"
+            discrollve:discrollve_scaleY="true"
+            discrollve:discrollve_threshold="0.26">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Live status"
+                    android:textColor="#FFFF00"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Track your booking from requested → accepted → in progress → done."
+                    android:textColor="#FFFFFF" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/tvBottomCta"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="26dp"
+            android:layout_marginBottom="26dp"
+            android:text="Tip: Try sending a test request from the Booking tab.\nYou’ll see it instantly on the mechanic side."
+            android:gravity="center"
+            android:textColor="#FFFFFF"
+            discrollve:discrollve_alpha="true"
+            discrollve:discrollve_translation="fromRight|fromBottom"
+            discrollve:discrollve_scaleX="true"
+            discrollve:discrollve_scaleY="true"
+            discrollve:discrollve_threshold="0.34" />
+
+    </com.flavienlaurent.discrollview.lib.DiscrollViewContent>
+
+</com.flavienlaurent.discrollview.lib.DiscrollView>

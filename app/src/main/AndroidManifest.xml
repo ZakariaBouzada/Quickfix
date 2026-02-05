@@ -12,7 +12,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MyApplication">
 
-        <!-- NEW: Login is the launcher -->
+
+
+        <!-- MAIN: login först -->
         <activity
             android:name=".LoginActivity"
             android:exported="true">
@@ -22,10 +24,18 @@
             </intent-filter>
         </activity>
 
-        <!-- Your existing main app activity (no launcher filter) -->
+        <activity android:name=".SignupActivity" />
+
+        <!-- Customer UI med bottom nav -->
         <activity
             android:name=".BIkeRepairApp"
             android:exported="false" />
+
+        <!-- Mechanic-dashboard -->
+        <activity
+            android:name=".MechanicActivity"
+            android:exported="false" />
+
     </application>
 
 </manifest>

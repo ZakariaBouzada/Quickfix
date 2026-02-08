@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
@@ -12,11 +13,11 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <!-- Header row: back left + title centered -->
+        <!-- Header row -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="48dp"
-            android:layout_marginBottom="6dp">
+            android:layout_marginBottom="10dp">
 
             <ImageButton
                 android:id="@+id/btnBackBookingForm"
@@ -36,17 +37,23 @@
                 android:layout_gravity="center"
                 android:text="Book a repair"
                 android:textStyle="bold"
-                android:textSize="28sp"
+                android:textSize="26sp"
                 android:textColor="#FFFF00" />
-
         </FrameLayout>
 
-
+        <!-- Small step label -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:text="QuickFix • Booking"
+            android:textSize="12sp"
+            android:textColor="#777777" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Choose a problem type, preferred time and add the location!"
+            android:text="Choose a problem type, preferred time and set the location."
             android:textSize="14sp"
             android:textColor="#BDBDBD" />
 
@@ -70,6 +77,15 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="Step 1 • Problem type"
+                    android:textColor="#777777"
+                    android:textStyle="bold"
+                    android:textSize="12sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
                     android:text="What is the problem?"
                     android:textColor="#FFFFFF"
                     android:textStyle="bold"
@@ -119,6 +135,14 @@
                         android:textStyle="bold"
                         app:cornerRadius="14dp" />
                 </LinearLayout>
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Tip: include a photo for faster diagnosis."
+                    android:textColor="#777777"
+                    android:textSize="12sp" />
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
@@ -127,7 +151,7 @@
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="14dp"
             app:cardCornerRadius="18dp"
             app:cardElevation="0dp"
             app:strokeColor="#2A2A2A"
@@ -140,52 +164,138 @@
                 android:orientation="vertical"
                 android:padding="16dp">
 
-                <EditText
-                    android:id="@+id/etDateTime"
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Step 2 • Details"
+                    android:textColor="#777777"
+                    android:textStyle="bold"
+                    android:textSize="12sp" />
+
+                <!-- Preferred time -->
+                <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:hint="Preferred date and time"
-                    android:background="@android:color/transparent"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#666666"
-                    android:padding="12dp" />
+                    app:boxBackgroundMode="filled"
+                    app:boxBackgroundColor="#0F0F0F"
+                    app:boxCornerRadiusTopStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:hintTextColor="#666666"
+                    app:boxStrokeColor="#2A2A2A">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#1F1F1F" />
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etDateTime"
+                        android:layout_width="match_parent"
+                        android:layout_height="52dp"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#666666"
+                        android:padding="12dp"
+                        android:focusable="false"
+                        android:clickable="true" />
+                </com.google.android.material.textfield.TextInputLayout>
 
-                <EditText
-                    android:id="@+id/etLocation"
+                <!-- Location row -->
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
-                    android:layout_height="52dp"
-                    android:hint="Location in Turku"
-                    android:background="@android:color/transparent"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#666666"
-                    android:padding="12dp" />
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp">
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="#1F1F1F" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/tilLocation"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:hint="Location in Turku"
+                        app:boxBackgroundMode="filled"
+                        app:boxBackgroundColor="#0F0F0F"
+                        app:boxCornerRadiusTopStart="14dp"
+                        app:boxCornerRadiusTopEnd="14dp"
+                        app:boxCornerRadiusBottomStart="14dp"
+                        app:boxCornerRadiusBottomEnd="14dp"
+                        app:hintTextColor="#666666"
+                        app:boxStrokeColor="#2A2A2A"
+                        android:layout_marginEnd="10dp"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintEnd_toStartOf="@+id/mapPickContainer"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintBottom_toBottomOf="parent">
 
-                <EditText
-                    android:id="@+id/etDescription"
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etLocation"
+                            android:layout_width="match_parent"
+                            android:layout_height="52dp"
+                            android:textColor="#FFFFFF"
+                            android:textColorHint="#666666"
+                            android:padding="12dp" />
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <!-- Yellow square + perfectly centered icon -->
+                    <FrameLayout
+                        android:id="@+id/mapPickContainer"
+                        android:layout_width="52dp"
+                        android:layout_height="52dp"
+                        android:background="@drawable/bg_qf_yellow_square_14"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintTop_toTopOf="@+id/tilLocation"
+                        app:layout_constraintBottom_toBottomOf="@+id/tilLocation">
+
+                        <ImageButton
+                            android:id="@+id/btnPickOnMap"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@android:color/transparent"
+                            android:src="@drawable/ic_map_pin"
+                            android:contentDescription="Pick on map"
+                            android:scaleType="centerInside"
+                            android:padding="12dp"
+                            app:tint="#000000" />
+                    </FrameLayout>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/tvPickedAddressHint"
                     android:layout_width="match_parent"
-                    android:layout_height="120dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="Tip: use the map button to pinpoint the exact address"
+                    android:textColor="#777777"
+                    android:textSize="12sp" />
+
+                <!-- Description -->
+                <com.google.android.material.textfield.TextInputLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
                     android:hint="Describe the issue"
-                    android:background="@android:color/transparent"
-                    android:gravity="top"
-                    android:textColor="#FFFFFF"
-                    android:textColorHint="#666666"
-                    android:padding="12dp" />
+                    app:boxBackgroundMode="filled"
+                    app:boxBackgroundColor="#0F0F0F"
+                    app:boxCornerRadiusTopStart="14dp"
+                    app:boxCornerRadiusTopEnd="14dp"
+                    app:boxCornerRadiusBottomStart="14dp"
+                    app:boxCornerRadiusBottomEnd="14dp"
+                    app:hintTextColor="#666666"
+                    app:boxStrokeColor="#2A2A2A">
 
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etDescription"
+                        android:layout_width="match_parent"
+                        android:layout_height="120dp"
+                        android:gravity="top"
+                        android:textColor="#FFFFFF"
+                        android:textColorHint="#666666"
+                        android:padding="12dp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- Photo -->
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnAddPhoto"
                     android:layout_width="match_parent"
                     android:layout_height="44dp"
-                    android:layout_marginTop="10dp"
+                    android:layout_marginTop="12dp"
                     android:text="Add photo"
                     android:textAllCaps="false"
                     android:textStyle="bold"
@@ -195,30 +305,39 @@
                     app:strokeColor="#FFFF00"
                     app:strokeWidth="1dp" />
 
-                <ImageView
-                    android:id="@+id/ivPhotoPreview"
+                <!-- Photo preview -->
+                <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
-                    android:layout_height="180dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:scaleType="centerCrop"
-                    android:visibility="gone" />
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:strokeColor="#1F1F1F"
+                    app:strokeWidth="1dp"
+                    app:cardBackgroundColor="#0F0F0F">
 
-                <!-- This is your circular loading confirm button -->
+                    <ImageView
+                        android:id="@+id/ivPhotoPreview"
+                        android:layout_width="match_parent"
+                        android:layout_height="180dp"
+                        android:scaleType="centerCrop"
+                        android:visibility="gone" />
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Submit (cleaner + smaller) -->
                 <de.timonknispel.ktloadingbutton.KTLoadingButton
                     android:id="@+id/btnConfirm"
                     android:layout_width="match_parent"
-                    android:layout_height="54dp"
+                    android:layout_height="38dp"
                     android:layout_marginTop="14dp"
-                    android:paddingStart="18dp"
-                    android:paddingEnd="18dp"
-                    app:buttonName="Submit booking"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    app:buttonName="Submit"
                     app:buttonTextSize="14sp"
                     app:allCaps="false"
-                    app:buttonColor="@color/quickfix_yellow"
-                    app:succeedColor="@color/quickfix_yellow"
+                    app:buttonColor="#FFFF00"
+                    app:succeedColor="#FFFF00"
                     app:failedColor="@color/quickfix_purple" />
-
-
 
                 <!-- Customer confirms completion (hidden until status completed_pending) -->
                 <com.google.android.material.button.MaterialButton
@@ -236,7 +355,7 @@
 
             </LinearLayout>
 
-
+            <!-- Status area (kept, hidden) -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -276,9 +395,44 @@
 
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Tips card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#1F1F1F"
+            app:strokeWidth="1dp"
+            app:cardBackgroundColor="#0B0B0B">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="14dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Tips for faster repair"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="• Add a photo\n• Pinpoint the exact spot on the map\n• Mention symptoms (noise, wobble, flat, skipping)"
+                    android:textColor="#BDBDBD"
+                    android:textSize="13sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <View
             android:layout_width="match_parent"
-            android:layout_height="24dp" />
+            android:layout_height="22dp" />
 
     </LinearLayout>
 </ScrollView>

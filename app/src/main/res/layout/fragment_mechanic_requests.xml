@@ -13,15 +13,52 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- TITLE -->
-        <TextView
-            android:id="@+id/tvMechanicRequestsTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Requests"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="#FFFF00" />
+        <!-- HEADER ROW: title left, message icon right -->
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- TITLE -->
+            <TextView
+                android:id="@+id/tvMechanicRequestsTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Requests"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:textColor="#FFFF00"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toStartOf="@+id/btnMessages"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginEnd="12dp" />
+
+            <!-- MESSAGE BUTTON -->
+            <FrameLayout
+                android:id="@+id/messagesBtnContainer"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent">
+
+                <ImageButton
+                    android:id="@+id/btnMessages"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/qf_icon_btn_bg"
+                    android:contentDescription="Messages"
+                    android:padding="9dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_message"
+                    app:tint="#FFFF00" />
+
+                <!-- OPTIONAL: badge (hidden by default) -->
+
+
+            </FrameLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
             android:layout_width="match_parent"

@@ -7,6 +7,8 @@ import androidx.navigation.fragment.findNavController
 import com.example.bikerepairapp.R
 import com.example.bikerepairapp.notifications.NotificationBadgeManager
 import com.google.android.material.button.MaterialButton
+import com.example.bikerepairapp.ui.notifications.NotificationsBottomSheet
+
 
 class BookingFragment : Fragment(R.layout.fragment_booking) {
 
@@ -19,15 +21,24 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
         val btnOpenMyRepairs = view.findViewById<MaterialButton>(R.id.btnOpenMyRepairs)
 
         // Bell include (from fragment_booking.xml)
-        val bellInclude = view.findViewById<View>(R.id.includeNotifBell)
+
+        val header = view.findViewById<View>(R.id.includeHeaderActions)
+
+        header.findViewById<View>(R.id.btnMessages).setOnClickListener {
+            com.example.bikerepairapp.ui.messages.MessagesBottomSheet()
+                .show(parentFragmentManager, "messages")
+        }
+
+
+        val bellIncludeRoot = header.findViewById<View>(R.id.includeNotifBell) // only if you gave it an id
         notifBadge.bind(
-            includeRoot = bellInclude,
+            includeRoot = bellIncludeRoot,
             lifecycleOwner = viewLifecycleOwner,
             onBellClick = {
-                // Later: navigate to a Notifications screen
-                // For now: markSeenOnClick=true will clear the badge when tapped.
+                NotificationsBottomSheet().show(parentFragmentManager, "notifications")
             },
-            markSeenOnClick = true
+            // IMPORTANT: don't clear badge until sheet actually opens
+            markSeenOnClick = false
         )
 
         btnOpenBookingForm.setOnClickListener {

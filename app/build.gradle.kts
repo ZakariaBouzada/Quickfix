@@ -36,6 +36,11 @@ dependencies {
     implementation("com.github.flavienlaurent.discrollview:library:0.0.2@aar")
     implementation("info.hoang8f:fbutton:1.0.5")
     implementation("com.github.dmytrodanylyk:circular-progress-button:1.4")
+    implementation("org.osmdroid:osmdroid-android:6.1.18")
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.2.0")
+
 
 
 
@@ -52,6 +57,11 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("com.google.firebase:firebase-storage")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
+
+
+
 
     // -------- ROOM DATABASE --------
     implementation("androidx.room:room-runtime:2.6.1")

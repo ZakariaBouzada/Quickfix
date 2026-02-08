@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,25 +13,53 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Header -->
-        <TextView
-            android:id="@+id/tvProfileTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Profile"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="#FFFF00" />
+        <!-- Header row: title + settings wheel -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/tvProfileTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Profile"
+                android:textColor="#FFFF00"
+                android:textSize="26sp"
+                android:textStyle="bold" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/btnOpenSettings"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                app:cardBackgroundColor="#101010"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#2A2A2A"
+                app:strokeWidth="1dp">
+
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:padding="9dp"
+                    android:contentDescription="Settings"
+                    android:src="@drawable/setting"
+                    app:tint="#FFFF00" />
+            </com.google.android.material.card.MaterialCardView>
+
+        </RelativeLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="6dp"
-            android:text="Manage your account and bookings."
+            android:text="Account, preferences and support."
             android:textColor="#BDBDBD" />
 
-        <!-- Profile card -->
+        <!-- Profile card (D: profile picture preview + tap to change) -->
         <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardProfile"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="18dp"
@@ -44,40 +72,41 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="16dp">
 
-                <!-- Avatar + name/email -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
-                    <!-- simple avatar circle -->
+                    <!-- Clickable avatar -->
                     <com.google.android.material.card.MaterialCardView
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        app:cardCornerRadius="22dp"
+                        android:id="@+id/btnChangeAvatar"
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
                         app:cardBackgroundColor="#191919"
+                        app:cardCornerRadius="28dp"
+                        app:cardElevation="0dp"
                         app:strokeColor="#FFFF00"
-                        app:strokeWidth="1dp"
-                        app:cardElevation="0dp">
+                        app:strokeWidth="1dp">
 
-                        <TextView
+                        <ImageView
+                            android:id="@+id/ivAvatar"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:text="🙂"
-                            android:gravity="center"
-                            android:textSize="18sp"
-                            android:textColor="#FFFFFF" />
+                            android:padding="10dp"
+                            android:contentDescription="Avatar"
+                            android:src="@drawable/ic_person"
+                            android:tint="#FFFFFF" />
                     </com.google.android.material.card.MaterialCardView>
 
                     <LinearLayout
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
-                        android:layout_weight="1"
                         android:layout_marginStart="12dp"
+                        android:layout_weight="1"
                         android:orientation="vertical">
 
                         <TextView
@@ -85,9 +114,9 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Name"
-                            android:textStyle="bold"
+                            android:textColor="#FFFFFF"
                             android:textSize="18sp"
-                            android:textColor="#FFFFFF" />
+                            android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/tvUserEmail"
@@ -96,46 +125,21 @@
                             android:layout_marginTop="2dp"
                             android:text="Email"
                             android:textColor="#BDBDBD" />
+
+                        <TextView
+                            android:id="@+id/tvChangePhotoHint"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:text="Tap avatar to change photo"
+                            android:textColor="#8E8E8E" />
                     </LinearLayout>
+
                 </LinearLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginBottom="12dp"
-                    android:background="#2A2A2A" />
-
-                <!-- Rating (keep id) -->
-                <TextView
-                    android:id="@+id/tvRating"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Customer rating: –"
-                    android:textColor="#FFFFFF"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Ratings will appear after completed repairs."
-                    android:textColor="#BDBDBD" />
-
-                <!-- Repairs count: keep id for your Kotlin, but hide visually -->
-                <TextView
-                    android:id="@+id/tvCompletedRepairs"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Your repairs: 0"
-                    android:textColor="#FFFFFF"
-                    android:visibility="gone" />
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Last booking card -->
+        <!-- F: Lightweight stats -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -149,44 +153,163 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Last booking"
-                    android:textStyle="bold"
+                    android:text="Your stats"
                     android:textColor="#FFFF00"
-                    android:textSize="14sp" />
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
 
-                <TextView
-                    android:id="@+id/tvActivity"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="No bookings yet"
-                    android:textColor="#FFFFFF"
-                    android:lineSpacingExtra="2dp" />
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal">
 
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Total repairs"
+                            android:textColor="#BDBDBD" />
+
+                        <TextView
+                            android:id="@+id/tvTotalRepairs"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="#FFFFFF"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Open requests"
+                            android:textColor="#BDBDBD" />
+
+                        <TextView
+                            android:id="@+id/tvOpenRequests"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0"
+                            android:textColor="#FFFFFF"
+                            android:textSize="22sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+
+                </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Footer hint -->
+        <!-- E: Notification preferences -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardBackgroundColor="#101010"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#2A2A2A"
+            app:strokeWidth="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Notifications"
+                    android:textColor="#FFFF00"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switchBookingUpdates"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:text="Booking updates"
+                    android:textColor="#FFFFFF" />
+
+                <com.google.android.material.switchmaterial.SwitchMaterial
+                    android:id="@+id/switchChatNotifications"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Chat messages"
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="These are local toggles for now (push notifications later)."
+                    android:textColor="#8E8E8E" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- B: Support / Help shortcut -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnSupport"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="14dp"
+            android:text="Support / Help"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            app:cornerRadius="14dp"
+            app:backgroundTint="#191919"
+            app:strokeColor="#2A2A2A"
+            app:strokeWidth="1dp" />
+
+        <!-- C: App info -->
         <TextView
-            android:id="@+id/tvSettingsHint"
+            android:id="@+id/tvAppInfo"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="12dp"
-            android:text="Notifications and more settings coming later."
+            android:text="QuickFix v1.0 • Made in Turku"
             android:textColor="#8E8E8E" />
+
+        <TextView
+            android:id="@+id/tvPrivacy"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="Privacy policy coming later."
+            android:textColor="#8E8E8E"
+            android:paddingBottom="10dp"
+            android:clipToPadding="false"/>
 
         <!-- Logout -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
             android:layout_height="52dp"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="42dp"
+
             android:text="Log out"
             android:textAllCaps="false"
             android:textStyle="bold"
@@ -196,5 +319,14 @@
             app:strokeColor="#FFFF00"
             app:strokeWidth="1dp" />
 
+        <!-- Keep for Kotlin compatibility -->
+        <TextView
+            android:id="@+id/tvCompletedRepairs"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:visibility="gone"
+            android:text="Your repairs: 0" />
+
     </LinearLayout>
-</ScrollView>
+
+</androidx.core.widget.NestedScrollView>

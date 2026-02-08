@@ -16,15 +16,21 @@ class CustomerRepairsAdapter(
 
     private val items = mutableListOf<CustomerRepairRow>()
 
+    // ✅ local UI state: hide confirm after user taps it (until Firestore updates to "closed")
+    private val confirmClickedIds = mutableSetOf<String>()
+
     fun submitList(newItems: List<CustomerRepairRow>) {
         items.clear()
         items.addAll(newItems)
+
+        // optional cleanup so the set doesn't grow forever
+        val idsNow = items.map { it.id }.toSet()
+        confirmClickedIds.retainAll(idsNow)
+
         notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
-        // IMPORTANT: this must match the XML you actually use for customer rows
-        // If your file name is different, change this line only.
         val v = LayoutInflater.from(parent.context)
             .inflate(R.layout.item_customer_repair, parent, false)
         return VH(v)
@@ -33,22 +39,35 @@ class CustomerRepairsAdapter(
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        holder.bind(items[position], onConfirm)
+        holder.bind(
+            row = items[position],
+            onConfirm = onConfirm,
+            confirmClickedIds = confirmClickedIds
+        ) { clickedId ->
+            // hide immediately
+            confirmClickedIds.add(clickedId)
+
+            // ✅ compatible with older RecyclerView
+            val p = holder.adapterPosition
+            if (p != RecyclerView.NO_POSITION) {
+                notifyItemChanged(p)
+            }
+        }
     }
 
     class VH(itemView: View) : RecyclerView.ViewHolder(itemView) {
 
-        // REQUIRED (must exist in XML)
         private val tvIssue: TextView = itemView.findViewById(R.id.tvIssue)
         private val tvMeta: TextView = itemView.findViewById(R.id.tvMeta)
 
-        // OPTIONAL (won't crash if missing)
         private val tvStatus: TextView? = itemView.findViewById(R.id.tvStatus)
         private val btnConfirm: MaterialButton? = itemView.findViewById(R.id.btnConfirmRepair)
 
         fun bind(
             row: CustomerRepairRow,
-            onConfirm: ((CustomerRepairRow) -> Unit)?
+            onConfirm: ((CustomerRepairRow) -> Unit)?,
+            confirmClickedIds: Set<String>,
+            onOptimisticHide: (String) -> Unit
         ) {
             tvIssue.text = row.issue
             tvMeta.text = "${row.date} • ${row.location}"
@@ -68,20 +87,26 @@ class CustomerRepairsAdapter(
                 "Status: $prettyStatus"
             }
 
-            // Show confirm only when completed_pending
-            val canConfirm = row.status == "completed_pending" && onConfirm != null
+            // ✅ Show confirm only when completed_pending AND user hasn't clicked it already
+            val canConfirm =
+                row.status == "completed_pending" &&
+                        onConfirm != null &&
+                        !confirmClickedIds.contains(row.id)
 
             btnConfirm?.apply {
                 visibility = if (canConfirm) View.VISIBLE else View.GONE
 
-                // QuickFix style
                 val yellow = Color.parseColor("#FFFF00")
                 backgroundTintList = ColorStateList.valueOf(yellow)
                 setTextColor(Color.BLACK)
                 isAllCaps = false
                 text = "Confirm repair"
 
-                setOnClickListener { onConfirm?.invoke(row) }
+                setOnClickListener {
+                    // ✅ hide instantly so it doesn't pop back while rating screen is open
+                    onOptimisticHide(row.id)
+                    onConfirm?.invoke(row)
+                }
             }
         }
     }

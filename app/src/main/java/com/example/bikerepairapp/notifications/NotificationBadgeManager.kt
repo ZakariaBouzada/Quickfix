@@ -19,13 +19,6 @@ class NotificationBadgeManager(
     private var userListener: ListenerRegistration? = null
     private var reqListener: ListenerRegistration? = null
 
-    /**
-     * Bind bell include view to Firestore unread logic.
-     *
-     * includeRoot must be the <include ...> root view (FrameLayout from view_notification_bell.xml)
-     * lifecycleOwner: fragment's viewLifecycleOwner
-     * onBellClick: what you want to do when bell is tapped (open screen, etc.)
-     */
     fun bind(
         includeRoot: View,
         lifecycleOwner: LifecycleOwner,
@@ -33,7 +26,6 @@ class NotificationBadgeManager(
         markSeenOnClick: Boolean = true
     ) {
         val uid = auth.currentUser?.uid ?: run {
-            // Not logged in => hide badge
             includeRoot.findViewById<TextView>(R.id.tvNotifBadge)?.visibility = View.GONE
             return
         }
@@ -49,22 +41,25 @@ class NotificationBadgeManager(
             onBellClick?.invoke()
         }
 
-        // Listen for lastSeen updates on user doc
         userListener?.remove()
         userListener = firestore.collection("users").document(uid)
             .addSnapshotListener { userSnap, _ ->
                 if (userSnap == null) return@addSnapshotListener
-                val lastSeen = userSnap.getTimestamp("customerLastSeenNotificationsAt")
 
-                // Listen to requests for this customer and compute unread count
+                val lastSeen = userSnap.getTimestamp("customerLastSeenNotificationsAt")
+                val dismissed = (userSnap.get("customerDismissedNotifications") as? List<*>)
+                    ?.mapNotNull { it as? String }
+                    ?.toSet()
+                    ?: emptySet()
+
                 reqListener?.remove()
                 reqListener = firestore.collection("requests")
                     .whereEqualTo("customerId", uid)
                     .addSnapshotListener { snap, _ ->
                         if (snap == null) return@addSnapshotListener
 
-                        val unread = snap.documents.count { d ->
-                            isUnreadUpdate(d, lastSeen)
+                        val unread = snap.documents.sumOf { d ->
+                            countUnreadEvents(d, lastSeen, dismissed)
                         }
 
                         if (unread > 0) {
@@ -76,8 +71,6 @@ class NotificationBadgeManager(
                     }
             }
 
-        // Auto-cleanup when lifecycle is destroyed
-        // (still good practice to call unbind() in onDestroyView, but this helps)
         lifecycleOwner.lifecycle.addObserver(SimpleLifecycleObserver(onDestroy = { unbind() }))
     }
 
@@ -88,19 +81,34 @@ class NotificationBadgeManager(
         reqListener = null
     }
 
-    private fun isUnreadUpdate(doc: DocumentSnapshot, lastSeen: Timestamp?): Boolean {
-        val status = doc.getString("status") ?: return false
+    private fun countUnreadEvents(
+        doc: DocumentSnapshot,
+        lastSeen: Timestamp?,
+        dismissed: Set<String>
+    ): Int {
+        val status = doc.getString("status") ?: return 0
+        val requestId = doc.id
 
-        return when (status) {
-            "accepted" -> {
-                val t = doc.getTimestamp("acceptedAt")
-                lastSeen == null || (t != null && t > lastSeen)
-            }
-            "completed_pending" -> {
-                val t = doc.getTimestamp("completedAt")
-                lastSeen == null || (t != null && t > lastSeen)
-            }
-            else -> false
+        fun isUnread(t: Timestamp?): Boolean {
+            return lastSeen == null || (t != null && t > lastSeen)
         }
+
+        var c = 0
+
+        // accepted event
+        if (status == "accepted" || status == "completed_pending" || status == "closed") {
+            val t = doc.getTimestamp("acceptedAt")
+            val notifId = "$requestId:accepted"
+            if (notifId !in dismissed && isUnread(t)) c++
+        }
+
+        // completed_pending event
+        if (status == "completed_pending" || status == "closed") {
+            val t = doc.getTimestamp("completedAt")
+            val notifId = "$requestId:completed"
+            if (notifId !in dismissed && isUnread(t)) c++
+        }
+
+        return c
     }
 }

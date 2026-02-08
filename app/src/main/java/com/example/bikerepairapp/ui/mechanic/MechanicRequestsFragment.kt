@@ -13,6 +13,8 @@ import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.example.bikerepairapp.ui.messages.ChatBottomSheet
+
 
 class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
 
@@ -28,6 +30,14 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
+        val btnMessages = view.findViewById<android.widget.ImageButton>(R.id.btnMessages)
+        btnMessages.setOnClickListener {
+            // Open your messages bottom sheet (mechanic side)
+            com.example.bikerepairapp.ui.messages.MessagesBottomSheet()
+                .show(parentFragmentManager, "messages")
+        }
+
+
         val rvIncoming = view.findViewById<RecyclerView>(R.id.rvIncoming)
         val rvActive = view.findViewById<RecyclerView>(R.id.rvActive)
 
@@ -37,6 +47,7 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
         incomingAdapter = IncomingRequestsAdapter(
             onAccept = { acceptRequest(it) },
             onReject = { rejectRequest(it) }
+
         )
 
         activeAdapter = ActiveRequestsAdapter(
@@ -99,13 +110,25 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
         listenForActive()
     }
 
+    private fun openChatForRequest(req: RepairRequest) {
+        // If request doesn't have chatId yet, tell mechanic to accept first
+        if (req.chatId.isNullOrBlank()) {
+            Toast.makeText(requireContext(), "Accept the request to start chat", Toast.LENGTH_SHORT).show()
+            return
+        }
+        openChat(req.chatId!!)
+    }
+
+
     private fun currentUid(): String? = auth.currentUser?.uid
 
     private fun listenForIncoming() {
         val uid = currentUid() ?: return
 
+        // NOTE: querying "mechanicId == null" is unreliable.
+        // Better: query pending requests then filter by mechanicId null/missing.
         db.collection("requests")
-            .whereEqualTo("mechanicId", null)
+            .whereEqualTo("status", "pending")
             .addSnapshotListener { snap, e ->
                 if (e != null || snap == null) return@addSnapshotListener
 
@@ -113,21 +136,21 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
                     val rejectedBy = doc.get("rejectedBy") as? List<*> ?: emptyList<Any>()
                     if (rejectedBy.contains(uid)) return@mapNotNull null
 
-                    val status = doc.getString("status") ?: "pending"
-                    if (status != "pending") return@mapNotNull null
+                    val mechanicId = doc.getString("mechanicId")
+                    if (!mechanicId.isNullOrBlank()) return@mapNotNull null
 
                     RepairRequest(
                         id = doc.id,
                         issue = doc.getString("issue") ?: return@mapNotNull null,
                         date = doc.getString("date") ?: "",
                         location = doc.getString("location") ?: "",
-                        status = status,
+                        status = doc.getString("status") ?: "pending",
                         customerEmail = doc.getString("customerEmail") ?: "",
                         customerId = doc.getString("customerId") ?: "",
                         mechanicId = doc.getString("mechanicId"),
                         mechanicName = doc.getString("mechanicName"),
-                        // ✅ NEW (see note below about RepairRequest)
-                        customerName = doc.getString("customerName") ?: ""
+                        customerName = doc.getString("customerName") ?: "",
+                        chatId = doc.getString("chatId")
                     )
                 }
 
@@ -159,8 +182,8 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
                         customerId = doc.getString("customerId") ?: "",
                         mechanicId = doc.getString("mechanicId"),
                         mechanicName = doc.getString("mechanicName"),
-                        // ✅ NEW
-                        customerName = doc.getString("customerName") ?: ""
+                        customerName = doc.getString("customerName") ?: "",
+                        chatId = doc.getString("chatId")
                     )
                 }
 
@@ -168,31 +191,69 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
             }
     }
 
+    /**
+     * Accept request + ensure chat exists.
+     * - If request already has chatId -> just accept.
+     * - Else -> create chats/{id} and set requests/{id}.chatId.
+     */
     private fun acceptRequest(req: RepairRequest) {
-        val uid = currentUid() ?: return
-        val name = auth.currentUser?.email ?: "mechanic"
+        val mechanicId = currentUid() ?: return
+        val mechanicName = auth.currentUser?.email ?: "mechanic"
 
-        db.collection("requests").document(req.id)
-            .update(
-                mapOf(
-                    "status" to "accepted",
-                    "mechanicId" to uid,
-                    "mechanicName" to name,
-                    "acceptedAt" to FieldValue.serverTimestamp()
-                )
+        val reqRef = db.collection("requests").document(req.id)
+
+        db.runTransaction { tx ->
+            val reqSnap = tx.get(reqRef)
+            val existingChatId = reqSnap.getString("chatId")
+
+            // Always set accepted fields
+            val acceptedUpdate = mapOf(
+                "status" to "accepted",
+                "mechanicId" to mechanicId,
+                "mechanicName" to mechanicName,
+                "acceptedAt" to FieldValue.serverTimestamp()
             )
-            .addOnFailureListener {
-                Toast.makeText(requireContext(), "Failed to accept", Toast.LENGTH_SHORT).show()
+
+            if (!existingChatId.isNullOrBlank()) {
+                tx.update(reqRef, acceptedUpdate)
+                return@runTransaction existingChatId
             }
+
+            val customerId = reqSnap.getString("customerId") ?: ""
+            val chatRef = db.collection("chats").document()
+
+            tx.set(chatRef, mapOf(
+                "requestId" to req.id,
+                "customerId" to customerId,
+                "mechanicId" to mechanicId,
+                "participants" to listOf(customerId, mechanicId),
+                "createdAt" to FieldValue.serverTimestamp(),
+                "lastMessage" to "Mechanic accepted ✅",
+                "lastMessageAt" to FieldValue.serverTimestamp(),
+                "lastSenderId" to mechanicId
+            ))
+
+            tx.update(reqRef, acceptedUpdate + mapOf("chatId" to chatRef.id))
+            return@runTransaction chatRef.id
+        }.addOnSuccessListener { chatId ->
+            // Optional: open chat immediately after accept
+            openChat(chatId)
+        }.addOnFailureListener {
+            Toast.makeText(requireContext(), "Failed to accept", Toast.LENGTH_SHORT).show()
+        }
     }
+
+    private fun openChat(chatId: String) {
+        ChatBottomSheet.newInstance(chatId)
+            .show(parentFragmentManager, "chat")
+    }
+
 
     private fun rejectRequest(req: RepairRequest) {
         val uid = currentUid() ?: return
 
         db.collection("requests").document(req.id)
-            .update(
-                mapOf("rejectedBy" to FieldValue.arrayUnion(uid))
-            )
+            .update(mapOf("rejectedBy" to FieldValue.arrayUnion(uid)))
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Failed to reject", Toast.LENGTH_SHORT).show()
             }

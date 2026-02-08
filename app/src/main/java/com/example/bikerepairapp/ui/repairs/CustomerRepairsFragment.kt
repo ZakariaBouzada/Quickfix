@@ -2,17 +2,17 @@ package com.example.bikerepairapp.ui.repairs
 
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
+import android.widget.ImageButton
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bikerepairapp.R
+import com.example.bikerepairapp.ui.ratings.RateRepairBottomSheet
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.Query
-import androidx.navigation.fragment.findNavController
-import android.widget.ImageButton
 
 class CustomerRepairsFragment : Fragment(R.layout.fragment_customer_repairs) {
 
@@ -20,25 +20,17 @@ class CustomerRepairsFragment : Fragment(R.layout.fragment_customer_repairs) {
     private val auth = FirebaseAuth.getInstance()
 
     private lateinit var adapter: CustomerRepairsAdapter
+    private var repairsListener: ListenerRegistration? = null
 
-    private fun confirmCompleted(reqId: String) {
-        firestore.collection("requests").document(reqId)
-            .update(
-                mapOf(
-                    "status" to "closed",
-                    "closedAt" to FieldValue.serverTimestamp()
-                )
-            )
-            .addOnSuccessListener {
-                if (isAdded) Toast.makeText(requireContext(), "Confirmed ✅", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                if (isAdded) Toast.makeText(requireContext(), "Failed: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+    override fun onDestroyView() {
+        repairsListener?.remove()
+        repairsListener = null
+        super.onDestroyView()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val backBtn = view.findViewById<ImageButton>(R.id.btnBackCustomerRepairs)
         backBtn.setOnClickListener { findNavController().navigateUp() }
 
@@ -46,14 +38,16 @@ class CustomerRepairsFragment : Fragment(R.layout.fragment_customer_repairs) {
         rv.layoutManager = LinearLayoutManager(requireContext())
 
         adapter = CustomerRepairsAdapter { row ->
-            confirmCompleted(row.id)
+            // ✅ rating first, then the bottom sheet will close the request on submit
+            RateRepairBottomSheet
+                .newInstance(row.id)
+                .show(parentFragmentManager, "rate_repair")
         }
         rv.adapter = adapter
 
         val uid = auth.currentUser?.uid ?: return
 
         // Backwards compatible:
-        // old mode="accepted" will now behave like "active"
         val modeRaw = arguments?.getString("mode") ?: "all"
         val mode = if (modeRaw == "accepted") "active" else modeRaw
 
@@ -62,13 +56,13 @@ class CustomerRepairsFragment : Fragment(R.layout.fragment_customer_repairs) {
 
         val query = when (mode) {
             "closed" -> base.whereEqualTo("status", "closed")
-
             "active" -> base.whereIn("status", listOf("pending", "accepted", "completed_pending"))
-
-            else -> base // all
+            else -> base
         }
 
-        query
+        // ✅ Remove old listener if fragment is recreated
+        repairsListener?.remove()
+        repairsListener = query
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snap, err ->
                 if (err != null || snap == null) return@addSnapshotListener
@@ -85,6 +79,7 @@ class CustomerRepairsFragment : Fragment(R.layout.fragment_customer_repairs) {
 
                 adapter.submitList(list)
             }
+
     }
 }
 

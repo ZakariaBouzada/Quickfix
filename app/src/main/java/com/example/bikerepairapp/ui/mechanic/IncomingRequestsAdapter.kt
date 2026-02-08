@@ -32,8 +32,7 @@ class IncomingRequestsAdapter(
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        val item = items[position]
-        holder.bind(item, onAccept, onReject)
+        holder.bind(items[position], onAccept, onReject)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -53,28 +52,21 @@ class IncomingRequestsAdapter(
             val loc = req.location.ifBlank { "No location" }
             tvMeta.text = "$date • $loc"
 
-            // ---- UI-only styling ----
             val yellow = Color.parseColor("#FFFF00")
             val dark = Color.parseColor("#202020")
-            val white = Color.WHITE
-            val black = Color.BLACK
 
-            // Accept = primary (yellow filled)
             btnAccept.text = "Accept"
             btnAccept.isAllCaps = false
             btnAccept.cornerRadius = dp(12)
-            btnAccept.setPadding(dp(16), dp(10), dp(16), dp(10))
             btnAccept.backgroundTintList = ColorStateList.valueOf(yellow)
-            btnAccept.setTextColor(black)
+            btnAccept.setTextColor(Color.BLACK)
             btnAccept.strokeWidth = 0
 
-            // Reject = secondary (dark with yellow stroke)
             btnReject.text = "Reject"
             btnReject.isAllCaps = false
             btnReject.cornerRadius = dp(12)
-            btnReject.setPadding(dp(16), dp(10), dp(16), dp(10))
             btnReject.backgroundTintList = ColorStateList.valueOf(dark)
-            btnReject.setTextColor(white)
+            btnReject.setTextColor(Color.WHITE)
             btnReject.strokeColor = ColorStateList.valueOf(yellow)
             btnReject.strokeWidth = dp(1)
 

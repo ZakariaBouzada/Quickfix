@@ -3,19 +3,25 @@ package com.example.bikerepairapp.ui.profile
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.example.bikerepairapp.LoginActivity
 import com.example.bikerepairapp.R
 import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ListenerRegistration
 
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance()
+
+    private var userListener: ListenerRegistration? = null
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -23,65 +29,83 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val nameView = view.findViewById<TextView>(R.id.tvUserName)
         val emailView = view.findViewById<TextView>(R.id.tvUserEmail)
         val repairsView = view.findViewById<TextView>(R.id.tvCompletedRepairs)
-        val ratingView = view.findViewById<TextView>(R.id.tvRating)
-        val activityView = view.findViewById<TextView>(R.id.tvActivity)
         val logoutBtn = view.findViewById<MaterialButton>(R.id.btnLogout)
+        val avatarView = view.findViewById<ImageView>(R.id.ivAvatar)
 
         val user = auth.currentUser
         if (user == null) {
-            // ingen inloggad -> tillbaka till login
             goToLogin()
             return
         }
-
         val uid = user.uid
 
-        // 1) Hämta kundprofilen (name, email, ev. rating) från Firestore
-        db.collection("users").document(uid).get()
-            .addOnSuccessListener { snap ->
+        // Settings icon (top-right)
+        view.findViewById<View?>(R.id.btnOpenSettings)?.setOnClickListener {
+            findNavController().navigate(R.id.settingsFragment)
+        }
+
+        // 1) Live profile updates from Firestore users/{uid}
+        // This will automatically refresh when you update photoUrl in Settings.
+        userListener?.remove()
+        userListener = db.collection("users").document(uid)
+            .addSnapshotListener { snap, e ->
+                if (e != null) {
+                    // Don’t spam toasts every time; only show fallback values
+                    nameView.text = user.displayName ?: "Customer"
+                    emailView.text = user.email ?: ""
+                    avatarView.setImageResource(R.drawable.ic_person)
+                    return@addSnapshotListener
+                }
+
+                if (snap == null || !snap.exists()) {
+                    nameView.text = user.displayName ?: "Customer"
+                    emailView.text = user.email ?: ""
+                    avatarView.setImageResource(R.drawable.ic_person)
+                    return@addSnapshotListener
+                }
+
                 val name = snap.getString("name") ?: user.displayName ?: "Customer"
                 val email = snap.getString("email") ?: user.email ?: ""
-                val rating = snap.getDouble("rating") ?: 0.0
-
                 nameView.text = name
                 emailView.text = email
-                ratingView.text = "Customer rating: ${if (rating == 0.0) "–" else "$rating★"}"
-            }
-            .addOnFailureListener {
-                Toast.makeText(requireContext(), "Could not load profile", Toast.LENGTH_SHORT).show()
-            }
 
-        // 2) Hämta kundens bookings från Firestore (collection 'bookings')
-        db.collection("bookings")
-            .whereEqualTo("userId", uid)
-            .get()
-            .addOnSuccessListener { snap ->
-                val count = snap.size()
-                repairsView.text = "Your repairs: $count"
-
-                val last = snap.documents.firstOrNull()
-                if (last != null) {
-                    val issue = last.getString("issue") ?: "Unknown issue"
-                    val location = last.getString("location") ?: "Unknown location"
-                    val status = last.getString("status") ?: "Unknown status"
-
-                    activityView.text = "Last booking: $issue at $location\nStatus: $status"
+                val photoUrl = snap.getString("photoUrl")
+                if (!photoUrl.isNullOrBlank()) {
+                    Glide.with(this)
+                        .load(photoUrl)
+                        .circleCrop()
+                        .into(avatarView)
                 } else {
-                    activityView.text = "No bookings yet"
+                    avatarView.setImageResource(R.drawable.ic_person)
                 }
             }
+
+        // 2) Count requests (simple MVP)
+        db.collection("requests")
+            .whereEqualTo("customerId", uid)
+            .get()
+            .addOnSuccessListener { snap ->
+                repairsView.text = "Your repairs: ${snap.size()}"
+            }
             .addOnFailureListener {
-                activityView.text = "Could not load booking history"
+                // ignore quietly
             }
 
-        // 3) Logout-knapp
+        // 3) Logout
         logoutBtn.setOnClickListener {
             auth.signOut()
             goToLogin()
         }
     }
 
+    override fun onDestroyView() {
+        super.onDestroyView()
+        userListener?.remove()
+        userListener = null
+    }
+
     private fun goToLogin() {
+        Toast.makeText(requireContext(), "Please log in again", Toast.LENGTH_SHORT).show()
         val intent = Intent(requireContext(), LoginActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }

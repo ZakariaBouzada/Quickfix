@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#000000">
+
+    <!-- TOP BAR (matches your other back button style) -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginBottom="6dp"
+        android:background="#000000">
+
+        <ImageButton
+            android:id="@+id/btnBackHelp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_gravity="start|center_vertical"
+            android:src="@drawable/back"
+            android:contentDescription="Back"
+            android:background="@android:color/transparent"
+            android:padding="8dp"
+            android:scaleType="centerInside"
+            app:tint="#FFFF00" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Help"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="18sp" />
+    </FrameLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- SECTION: Quick overview -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="How QuickFix works"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="1) Create a repair request (Booking).\n2) A mechanic accepts it.\n3) Mechanic completes the repair.\n4) You confirm in My Repairs → ticket closes."
+                android:textColor="#CCCCCC"
+                android:textSize="14sp" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="18dp"
+                android:background="#222222" />
+
+            <!-- SECTION: FAQ -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="FAQ"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="• How do I book a repair?\nGo to Booking → Book a repair → fill in details → submit.\n\n• Can I add a photo?\nYes. Add a photo to help the mechanic diagnose faster.\n\n• How do I pay?\nFor now, payment is handled directly with the mechanic after the repair.\n\n• Parts and pricing\nService fee + parts if needed. You’ll see the final price before paying.\n\n• Can I cancel a request?\nIf it is still Pending, you can simply submit a new request with corrected info and ignore the old one. If a mechanic has Accepted it, contact the mechanic/support to cancel."
+                android:textColor="#CCCCCC"
+                android:textSize="14sp" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="18dp"
+                android:background="#222222" />
+
+            <!-- SECTION: Request statuses -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Repair status"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="• Pending\nYour request is sent and waiting for a mechanic.\n\n• Accepted\nA mechanic accepted your request.\n\n• Completed (waiting for confirmation)\nThe mechanic marked the repair as done. Confirm in My Repairs.\n\n• Closed\nYou confirmed the repair. The ticket is finished."
+                android:textColor="#CCCCCC"
+                android:textSize="14sp" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="18dp"
+                android:background="#222222" />
+
+            <!-- SECTION: Tips -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Tips for a faster repair"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="• Be specific: describe the issue, when it happens, and any sounds.\n\n• Add location details: door code, courtyard, exact spot.\n\n• Add a photo: damage, chain, brakes, or tire.\n\n• Mention urgency: if you need it fixed today/tomorrow.\n\n• If the bike is unsafe to ride, do not ride it — walk it or use public transport."
+                android:textColor="#CCCCCC"
+                android:textSize="14sp" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="18dp"
+                android:background="#222222" />
+
+            <!-- SECTION: Troubleshooting -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Troubleshooting"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="• I submitted a booking but don’t see it\nCheck My Repairs and pull to refresh (if available). Also make sure you’re logged into the correct account.\n\n• Status never updates\nMechanics update the status manually. If it stays Pending for long, try submitting another request with clearer details.\n\n• App feels stuck / buttons do nothing\nClose and reopen the app. If it continues, contact support with a screenshot."
+                android:textColor="#CCCCCC"
+                android:textSize="14sp" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="18dp"
+                android:background="#222222" />
+
+            <!-- SECTION: Privacy -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Privacy"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="Your account uses Firebase Authentication. Your repair requests are stored securely in Firestore and are only used to connect you with a mechanic for your booking."
+                android:textColor="#CCCCCC"
+                android:textSize="14sp" />
+
+            <!-- Divider -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="18dp"
+                android:layout_marginBottom="18dp"
+                android:background="#222222" />
+
+            <!-- SECTION: Contact -->
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Contact and support"
+                android:textColor="#FFFFFF"
+                android:textStyle="bold"
+                android:textSize="18sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="If something looks wrong (wrong status, missing ticket, app crash), contact support:\n\n• Email: support@quickfix.turku\n• Include: your email + what happened + screenshot (if possible)"
+                android:textColor="#CCCCCC"
+                android:textSize="14sp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:text="QuickFix — Turku bike repair, on demand."
+                android:textColor="#666666"
+                android:textSize="12sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -11,10 +11,12 @@
     <com.flavienlaurent.discrollview.lib.DiscrollViewContent
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="92dp"
         android:background="@drawable/bg_home_panel">
-
-        <!-- ✅ CHILD #1 -->
+        <!-- ✅ CHILD #1 (hero) -->
         <LinearLayout
             android:id="@+id/heroGroup"
             android:layout_width="match_parent"
@@ -40,19 +42,19 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/cardLogo"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="200dp"
                 android:layout_marginTop="6dp"
                 app:cardCornerRadius="32dp"
                 app:cardElevation="0dp"
                 app:cardUseCompatPadding="false"
                 android:clipToOutline="true"
                 app:strokeWidth="2dp"
-                app:strokeColor="#2A2A2A">
+                app:strokeColor="#2A2A2A"
+                app:cardBackgroundColor="@android:color/transparent">
 
-                <!-- Stack: bg image -> white overlay -> content -->
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="92dp">
+                    android:layout_height="match_parent">
 
                     <!-- Background image inside pill -->
                     <ImageView
@@ -61,10 +63,11 @@
                         android:layout_height="match_parent"
                         android:src="@drawable/home_bike_hero"
                         android:scaleType="centerCrop"
-                        android:alpha="0.95"
+                        android:alpha="1.0"
                         android:contentDescription="@null" />
 
                     <!-- White overlay (controls readability) -->
+                    <!-- Tip: reduce alpha if you want more photo visible -->
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
@@ -114,26 +117,347 @@
 
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnHomeBookNow"
-                android:layout_width="wrap_content"
-                android:layout_height="44dp"
-                android:layout_marginTop="16dp"
-                android:text="Book a repair"
-                android:textAllCaps="false"
-                android:textStyle="bold"
-                android:textColor="#000000"
-                app:cornerRadius="14dp"
-                app:backgroundTint="#FFFF00" />
+            <!-- ❌ Removed Book button (quick actions replace it) -->
         </LinearLayout>
 
-        <!-- ✅ CHILD #2+ (these can animate) -->
+        <!-- ✅ CHILD #2+ (MUST be direct children for Discroll animations to work) -->
 
+        <!-- Quick actions row (Book / My repairs / Help) -->
+        <LinearLayout
+            android:id="@+id/rowQuickActions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            discrollve:discrollve_alpha="true"
+            discrollve:discrollve_translation="fromBottom"
+            discrollve:discrollve_threshold="0.06">
+
+            <!-- BUTTON: BOOK -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardQuickBook"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#2A2A2A"
+                app:cardBackgroundColor="#101010">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_marginStart="10dp"
+                        android:tint="@android:color/white"
+                        android:src="@drawable/book"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="Book"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- BUTTON: MY REPAIRS -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardQuickRepairs"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#2A2A2A"
+                app:cardBackgroundColor="#101010">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_marginStart="10dp"
+                        android:tint="@android:color/white"
+                        android:src="@drawable/support"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="My repairs"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:maxLines="1"
+                        android:ellipsize="end" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- BUTTON: HELP -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardQuickHelp"
+                android:layout_width="0dp"
+                android:layout_height="56dp"
+                android:layout_weight="1"
+                android:clickable="true"
+                android:focusable="true"
+                android:foreground="?attr/selectableItemBackground"
+                app:cardCornerRadius="22dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#2A2A2A"
+                app:cardBackgroundColor="#101010">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingStart="12dp"
+                    android:paddingEnd="12dp">
+
+
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:layout_marginStart="10dp"
+                        android:tint="@android:color/white"
+                        android:src="@drawable/question"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="10dp"
+                        android:text="Help"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold"
+                        android:textSize="14sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- Pricing teaser -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardPricingTeaser"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="14dp"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="#2A2A2A"
+            app:cardBackgroundColor="#101010"
+            discrollve:discrollve_alpha="true"
+            discrollve:discrollve_translation="fromRight"
+            discrollve:discrollve_threshold="0.10">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="14dp"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Pricing"
+                    android:textColor="#FFFF00"
+                    android:textStyle="bold"
+                    android:textSize="15sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="Service fee from €X + parts if needed."
+                    android:textColor="#FFFFFF" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="You’ll see the final price before paying."
+                    android:textColor="#BDBDBD"
+                    android:textSize="12sp" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- WHY QUICKFIX heading -->
+        <TextView
+            android:id="@+id/tvWhyQuickFix"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:layout_marginBottom="10dp"
+            android:text="Why QuickFix?"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            discrollve:discrollve_alpha="true"
+            discrollve:discrollve_translation="fromBottom"
+            discrollve:discrollve_threshold="0.14" />
+
+        <!-- Trust badges row (above How it works) -->
+        <LinearLayout
+            android:id="@+id/rowTrustBadges"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            discrollve:discrollve_alpha="true"
+            discrollve:discrollve_translation="fromBottom"
+            discrollve:discrollve_threshold="0.18">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="66dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#2A2A2A"
+                app:cardBackgroundColor="#101010">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:tint="@android:color/white"
+                        android:src="@drawable/verify"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Verified\nmechanics"
+                        android:textColor="#FFFFFF"
+                        android:textSize="10sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="66dp"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#2A2A2A"
+                app:cardBackgroundColor="#101010">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/snap"
+                        android:tint="@android:color/white"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Easy\npayments"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="66dp"
+                android:layout_weight="1"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="#2A2A2A"
+                app:cardBackgroundColor="#101010">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="12dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:tint="@android:color/white"
+                        android:src="@drawable/fast"
+                        android:contentDescription="@null" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Fast\nresponse"
+                        android:textColor="#FFFFFF"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+        </LinearLayout>
+
+        <!-- How it works (ONLY ONE id) -->
         <TextView
             android:id="@+id/tvHowItWorks"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="18dp"
             android:layout_marginBottom="12dp"
             android:text="How does it work?"
             android:textColor="#FFFFFF"
@@ -141,7 +465,7 @@
             android:textSize="18sp"
             discrollve:discrollve_alpha="true"
             discrollve:discrollve_translation="fromBottom"
-            discrollve:discrollve_threshold="0.05" />
+            discrollve:discrollve_threshold="0.22" />
 
         <!-- CARD 1 -->
         <com.google.android.material.card.MaterialCardView
@@ -157,7 +481,7 @@
             discrollve:discrollve_translation="fromRight"
             discrollve:discrollve_scaleX="true"
             discrollve:discrollve_scaleY="true"
-            discrollve:discrollve_threshold="0.10">
+            discrollve:discrollve_threshold="0.26">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -212,7 +536,7 @@
             discrollve:discrollve_translation="fromLeft"
             discrollve:discrollve_scaleX="true"
             discrollve:discrollve_scaleY="true"
-            discrollve:discrollve_threshold="0.18">
+            discrollve:discrollve_threshold="0.34">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -267,7 +591,7 @@
             discrollve:discrollve_translation="fromBottom"
             discrollve:discrollve_scaleX="true"
             discrollve:discrollve_scaleY="true"
-            discrollve:discrollve_threshold="0.26">
+            discrollve:discrollve_threshold="0.42">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -297,15 +621,15 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="26dp"
-            android:layout_marginBottom="26dp"
-            android:text="Tip: Try sending a test request from the Booking tab.\nYou’ll see it instantly on the mechanic side."
+            android:layout_marginBottom="4dp"
+            android:text="If you run into an issue regarding our service please contact us at 'info.quickfix@gmail.com'"
             android:gravity="center"
             android:textColor="#FFFFFF"
             discrollve:discrollve_alpha="true"
             discrollve:discrollve_translation="fromRight|fromBottom"
             discrollve:discrollve_scaleX="true"
             discrollve:discrollve_scaleY="true"
-            discrollve:discrollve_threshold="0.34" />
+            discrollve:discrollve_threshold="0.52" />
 
     </com.flavienlaurent.discrollview.lib.DiscrollViewContent>
 

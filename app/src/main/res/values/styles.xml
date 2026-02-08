@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+    <style name="ThemeOverlay_QuickFix_BottomSheet" parent="ThemeOverlay.Material3.BottomSheetDialog">
+        <item name="bottomSheetStyle">@style/Widget_QuickFix_BottomSheet</item>
+    </style>
+
+    <style name="Widget_QuickFix_BottomSheet" parent="Widget.Material3.BottomSheet.Modal">
+        <item name="shapeAppearanceMediumComponent">@style/ShapeAppearance_QuickFix_BottomSheet</item>
+    </style>
+
+    <style name="ShapeAppearance_QuickFix_BottomSheet" parent="ShapeAppearance.Material3.Corner.ExtraLarge">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">22dp</item>
+    </style>
+
+
+</resources>

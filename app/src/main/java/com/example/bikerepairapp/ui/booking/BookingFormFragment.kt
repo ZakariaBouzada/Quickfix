@@ -1,5 +1,6 @@
 package com.example.bikerepairapp.ui.booking
 
+import android.content.Intent
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.media.MediaPlayer
@@ -25,14 +26,30 @@ import com.google.android.material.button.MaterialButton
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.GeoPoint
 import com.google.firebase.firestore.ListenerRegistration
 import de.timonknispel.ktloadingbutton.KTLoadingButton
 import kotlinx.coroutines.launch
+import com.google.android.material.datepicker.MaterialDatePicker
+import com.google.android.material.timepicker.MaterialTimePicker
+import com.google.android.material.timepicker.TimeFormat
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
+import com.example.bikerepairapp.ui.notifications.NotificationsBottomSheet
+import com.example.bikerepairapp.notifications.NotificationBadgeManager
+
 
 class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
 
     private var selectedImageUri: Uri? = null
     private var selectedProblemType: String = "Tires"
+
+    // Map-picked location (optional)
+    private var pickedLat: Double? = null
+    private var pickedLng: Double? = null
+    private var pickedAddress: String? = null
 
     // Keeping these so you don't lose work, but we won't use "confirm completed" now
     private var lastRequestId: String? = null
@@ -42,7 +59,10 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
     private lateinit var auth: FirebaseAuth
 
     private var successPlayer: MediaPlayer? = null
+    private val notifBadge = NotificationBadgeManager()
 
+
+    // ---- Image picker ----
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
@@ -59,7 +79,37 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
         }
     }
 
+    // ---- Map picker ----
+    private val pickOnMapLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode != AppCompatActivity.RESULT_OK) return@registerForActivityResult
+        val data = result.data ?: return@registerForActivityResult
+
+        val address = data.getStringExtra(OsmMapPickerActivity.EXTRA_ADDRESS)
+        val lat = data.getDoubleExtra(OsmMapPickerActivity.EXTRA_LAT, Double.NaN)
+        val lng = data.getDoubleExtra(OsmMapPickerActivity.EXTRA_LNG, Double.NaN)
+
+
+        pickedAddress = address
+        pickedLat = if (!lat.isNaN()) lat else null
+        pickedLng = if (!lng.isNaN()) lng else null
+
+        val root = view ?: return@registerForActivityResult
+        val locationInput = root.findViewById<EditText>(R.id.etLocation)
+        val hint = root.findViewById<TextView>(R.id.tvPickedAddressHint)
+
+        if (!address.isNullOrBlank()) {
+            locationInput.setText(address)
+            hint.text = "Picked from map ✅"
+        } else {
+            hint.text = "Could not resolve address — try another point"
+        }
+    }
+
     override fun onDestroyView() {
+        notifBadge.unbind()
+
         requestListener?.remove()
         requestListener = null
 
@@ -89,6 +139,33 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
             findNavController().navigateUp()
         }
 
+        // --- Header actions (bell / messages) in BookingFormFragment ---
+// Only run if this layout actually has the include
+        val header = view.findViewById<View?>(R.id.includeHeaderActions)
+
+        if (header != null) {
+            // Messages button (optional)
+            header.findViewById<View?>(R.id.btnMessages)?.setOnClickListener {
+                com.example.bikerepairapp.ui.messages.MessagesBottomSheet()
+                    .show(parentFragmentManager, "messages")
+            }
+
+            // Bell include root (optional)
+            val bellIncludeRoot = header.findViewById<View?>(R.id.includeNotifBell)
+            if (bellIncludeRoot != null) {
+                notifBadge.bind(
+                    includeRoot = bellIncludeRoot,
+                    lifecycleOwner = viewLifecycleOwner,
+                    onBellClick = {
+                        NotificationsBottomSheet().show(parentFragmentManager, "notifications")
+                    },
+                    markSeenOnClick = false
+                )
+            }
+        }
+
+
+
         // PNG back button in your XML
         val backBtn = view.findViewById<ImageButton>(R.id.btnBackBookingForm)
         backBtn.setOnClickListener { findNavController().navigateUp() }
@@ -98,6 +175,57 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
         setHasOptionsMenu(true)
 
         val dateTimeInput = view.findViewById<EditText>(R.id.etDateTime)
+        // ---- Date & time picker UX (writes into etDateTime) ----
+        dateTimeInput.isFocusable = false
+        dateTimeInput.isClickable = true
+
+
+
+        val cal = Calendar.getInstance()
+
+        fun formatDateTime(c: Calendar): String {
+            // Example: "Fri 6 Feb 14:30"
+            val df = SimpleDateFormat("EEE d MMM HH:mm", Locale.getDefault())
+            return df.format(Date(c.timeInMillis))
+        }
+
+        fun openTimePicker() {
+            val tp = MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_24H) // Finland → 24h feels right
+                .setHour(cal.get(Calendar.HOUR_OF_DAY))
+                .setMinute(cal.get(Calendar.MINUTE))
+                .setTitleText("Select time")
+                .build()
+
+            tp.addOnPositiveButtonClickListener {
+                cal.set(Calendar.HOUR_OF_DAY, tp.hour)
+                cal.set(Calendar.MINUTE, tp.minute)
+                dateTimeInput.setText(formatDateTime(cal))
+            }
+
+            tp.show(parentFragmentManager, "time_picker")
+        }
+
+        fun openDatePicker() {
+            val dp = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Select date")
+                .setSelection(cal.timeInMillis)
+                .build()
+
+            dp.addOnPositiveButtonClickListener { selection ->
+                cal.timeInMillis = selection
+                // After date chosen, ask time
+                openTimePicker()
+            }
+
+            dp.show(parentFragmentManager, "date_picker")
+        }
+
+        dateTimeInput.setOnClickListener {
+            openDatePicker()
+        }
+
+
         val locationInput = view.findViewById<EditText>(R.id.etLocation)
         val descInput = view.findViewById<EditText>(R.id.etDescription)
 
@@ -115,6 +243,14 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
 
         val addPhotoButton = view.findViewById<MaterialButton>(R.id.btnAddPhoto)
         addPhotoButton.setOnClickListener { pickImageLauncher.launch("image/*") }
+
+        // NEW: pick on map button (exists in the updated XML)
+        val btnPickOnMap = view.findViewById<ImageButton>(R.id.btnPickOnMap)
+
+
+        btnPickOnMap.setOnClickListener {
+            pickOnMapLauncher.launch(Intent(requireContext(), OsmMapPickerActivity::class.java))
+        }
 
         val btnTires = view.findViewById<MaterialButton>(R.id.btnTires)
         val btnChain = view.findViewById<MaterialButton>(R.id.btnChain)
@@ -175,7 +311,6 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
         // SUBMIT booking
         confirmButton.setOnClickListener {
             // Always start from a clean state on click
-            // (prevents "stuck spinning" from any earlier attempt)
             confirmButton.reset()
             confirmButton.isEnabled = true
 
@@ -183,11 +318,10 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
             val whereText = locationInput.text.toString().trim()
             val issueText = descInput.text.toString().trim()
 
-            // Validation (if invalid: show toast + keep button normal)
+            // Validation
             if (whenText.isBlank() || whereText.isBlank() || issueText.isBlank()) {
                 Toast.makeText(requireContext(), "Please fill all fields", Toast.LENGTH_SHORT).show()
 
-                // Optional: flash fail state quickly
                 confirmButton.doResult(false)
                 confirmButton.postDelayed({
                     confirmButton.reset()
@@ -213,7 +347,7 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
                 return@setOnClickListener
             }
 
-            // Now we are actually submitting → start loading
+            // Start loading
             confirmButton.isEnabled = false
             confirmButton.startLoading()
 
@@ -232,7 +366,7 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
                 showStatus(myBookingHeader, statusTitle, statusDetails, ticket)
             }
 
-            // 2) Firestore
+            // 2) Firestore: fetch customerName if possible, fallback if not
             firestore.collection("users").document(customerId).get()
                 .addOnSuccessListener { snap ->
                     val customerName =
@@ -240,11 +374,14 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
                             ?: currentUser.displayName
                             ?: (customerEmail ?: "Customer")
 
+                    val fullIssue = "${selectedProblemType}: $issueText"
+
                     val requestDoc = hashMapOf(
+                        // Core schema (unchanged)
                         "customerId" to customerId,
                         "customerEmail" to customerEmail,
                         "customerName" to customerName,
-                        "issue" to issueText,
+                        "issue" to fullIssue,
                         "date" to whenText,
                         "location" to whereText,
                         "status" to "pending",
@@ -253,6 +390,12 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
                         "mechanicId" to null,
                         "mechanicName" to null
                     )
+
+                    // Optional extra fields (safe to add)
+                    pickedAddress?.let { requestDoc["locationAddress"] = it }
+                    if (pickedLat != null && pickedLng != null) {
+                        requestDoc["locationGeo"] = GeoPoint(pickedLat!!, pickedLng!!)
+                    }
 
                     firestore.collection("requests")
                         .add(requestDoc)
@@ -265,19 +408,15 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
                         }
                 }
                 .addOnFailureListener { e ->
-                    handleBookingFailure(confirmButton, e.message)
-                }
-
-
-            .addOnFailureListener { e ->
-                    // fallback: use email/displayName as name
+                    // If user doc fetch fails, still submit with fallback name
                     val fallbackName = currentUser.displayName ?: (customerEmail ?: "Customer")
+                    val fullIssue = "${selectedProblemType}: $issueText"
 
                     val requestDoc = hashMapOf(
                         "customerId" to customerId,
                         "customerEmail" to customerEmail,
                         "customerName" to fallbackName,
-                        "issue" to issueText,
+                        "issue" to fullIssue,
                         "date" to whenText,
                         "location" to whereText,
                         "status" to "pending",
@@ -286,6 +425,11 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
                         "mechanicId" to null,
                         "mechanicName" to null
                     )
+
+                    pickedAddress?.let { requestDoc["locationAddress"] = it }
+                    if (pickedLat != null && pickedLng != null) {
+                        requestDoc["locationGeo"] = GeoPoint(pickedLat!!, pickedLng!!)
+                    }
 
                     firestore.collection("requests")
                         .add(requestDoc)

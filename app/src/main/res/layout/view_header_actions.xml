@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center_vertical">
+
+    <!-- Messages button -->
+    <ImageButton
+        android:id="@+id/btnMessages"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@android:color/transparent"
+        android:padding="8dp"
+        android:scaleType="centerInside"
+        android:contentDescription="Messages"
+        android:src="@drawable/ic_message"
+        app:tint="#FFFF00" />
+
+    <View
+        android:layout_width="8dp"
+        android:layout_height="1dp" />
+
+    <!-- Bell include (keep your existing bell layout inside) -->
+    <include
+        android:id="@+id/includeNotifBell"
+        layout="@layout/view_notification_bell" />
+
+</LinearLayout>

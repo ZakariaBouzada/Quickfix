@@ -1,5 +1,6 @@
 package com.example.bikerepairapp.ui.booking
 
+import android.annotation.SuppressLint
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.media.MediaPlayer
@@ -127,6 +128,13 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
         val yellow = Color.parseColor("#FFFF00")
         val dark = Color.parseColor("#202020")
 
+
+// Check if we came from a map pin drop
+        val prefilledAddress = arguments?.getString("prefillAddress")
+        if (!prefilledAddress.isNullOrEmpty()) {
+            locationInput.setText(prefilledAddress)
+        }
+
         fun styleSelected(b: MaterialButton) {
             b.backgroundTintList = ColorStateList.valueOf(yellow)
             b.setTextColor(Color.BLACK)
@@ -182,6 +190,20 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
             val whenText = dateTimeInput.text.toString().trim()
             val whereText = locationInput.text.toString().trim()
             val issueText = descInput.text.toString().trim()
+            // Convert address -> lat/lng
+            val latLng = getLatLngFromAddress(whereText)
+
+            if (latLng == null) {
+                Toast.makeText(requireContext(), "Could not find that address", Toast.LENGTH_SHORT).show()
+
+                confirmButton.doResult(false)
+                confirmButton.postDelayed({
+                    confirmButton.reset()
+                    confirmButton.isEnabled = true
+                }, 1000)
+
+                return@setOnClickListener
+            }
 
             // Validation (if invalid: show toast + keep button normal)
             if (whenText.isBlank() || whereText.isBlank() || issueText.isBlank()) {
@@ -246,7 +268,9 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
                         "customerName" to customerName,
                         "issue" to issueText,
                         "date" to whenText,
-                        "location" to whereText,
+                        "locationText" to whereText,
+                        "locationLat" to latLng.first,
+                        "locationLng" to latLng.second,
                         "status" to "pending",
                         "imageUri" to (selectedImageUri?.toString()),
                         "createdAt" to FieldValue.serverTimestamp(),
@@ -279,7 +303,9 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
                         "customerName" to fallbackName,
                         "issue" to issueText,
                         "date" to whenText,
-                        "location" to whereText,
+                        "locationText" to whereText,
+                        "locationLat" to latLng.first,
+                        "locationLng" to latLng.second,
                         "status" to "pending",
                         "imageUri" to (selectedImageUri?.toString()),
                         "createdAt" to FieldValue.serverTimestamp(),
@@ -333,6 +359,7 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
     }
 
     // Keeping these so you don't lose code; not used right now since "confirm completed" is later
+    @SuppressLint("SetTextI18n")
     private fun attachCustomerRequestListener(
         myBookingHeader: TextView,
         statusTitle: TextView,
@@ -398,6 +425,7 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
             }
     }
 
+    @SuppressLint("SetTextI18n")
     private fun showStatus(
         header: TextView,
         title: TextView,
@@ -417,5 +445,31 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
             Status: ${ticket.status}
             Mechanic: Not assigned yet (local)
         """.trimIndent()
+    }
+    private fun getLatLngFromAddress(address: String): Pair<Double, Double>? {
+        return try {
+            val geocoder = android.location.Geocoder(requireContext())
+
+            // Force Turku context
+            val fullAddress = "$address, Turku, Finland"
+
+            val results = geocoder.getFromLocationName(fullAddress, 1)
+
+            if (!results.isNullOrEmpty()) {
+                val location = results[0]
+
+                // Extra safety: ensure it's actually Turku
+                if (location.locality == "Turku" ||
+                    location.adminArea == "Southwest Finland") {
+
+                    Pair(location.latitude, location.longitude)
+                } else {
+                    null
+                }
+            } else null
+
+        } catch (e: Exception) {
+            null
+        }
     }
 }

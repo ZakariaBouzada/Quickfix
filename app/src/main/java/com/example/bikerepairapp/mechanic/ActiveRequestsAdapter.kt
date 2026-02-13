@@ -10,12 +10,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.bikerepairapp.R
 import com.google.android.material.button.MaterialButton
 
+
+
+
 class ActiveRequestsAdapter(
     private val onComplete: (RepairRequest) -> Unit,
     private val onRelease: (RepairRequest) -> Unit
 ) : RecyclerView.Adapter<ActiveRequestsAdapter.ViewHolder>() {
 
     private val items = mutableListOf<RepairRequest>()
+    private var highlightedId: String? = null
 
     fun submitList(newItems: List<RepairRequest>) {
         items.clear()
@@ -34,7 +38,19 @@ class ActiveRequestsAdapter(
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         holder.bind(item, onComplete, onRelease)
+
+        if (item.id == highlightedId) {
+            holder.itemView.setBackgroundColor(Color.parseColor("#333300"))
+        } else {
+            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
+        }
     }
+
+    fun highlightItem(id: String) {
+        highlightedId = id
+        notifyDataSetChanged()
+    }
+
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val tvIssue: TextView = itemView.findViewById(R.id.tvIssue)

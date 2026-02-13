@@ -30,7 +30,7 @@ class NotificationBadgeManager(
         includeRoot: View,
         lifecycleOwner: LifecycleOwner,
         onBellClick: (() -> Unit)? = null,
-        markSeenOnClick: Boolean = true
+        markSeenOnClick: Boolean = false
     ) {
         val uid = auth.currentUser?.uid ?: run {
             // Not logged in => hide badge
@@ -73,6 +73,8 @@ class NotificationBadgeManager(
                         } else {
                             tvBadge.visibility = View.GONE
                         }
+                        println("Requests size: ${snap?.size()}")
+                        println("Unread count: $unread")
                     }
             }
 

@@ -22,14 +22,21 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
     private lateinit var incomingAdapter: IncomingRequestsAdapter
     private lateinit var activeAdapter: ActiveRequestsAdapter
 
+    private lateinit var rvIncoming: RecyclerView
+    private lateinit var rvActive: RecyclerView
+
+
+    private var highlightRequestId: String? = null
+
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
-        val rvIncoming = view.findViewById<RecyclerView>(R.id.rvIncoming)
-        val rvActive = view.findViewById<RecyclerView>(R.id.rvActive)
+        rvIncoming = view.findViewById(R.id.rvIncoming)
+        rvActive = view.findViewById(R.id.rvActive)
 
         val btnIncoming = view.findViewById<MaterialButton>(R.id.btnTabIncoming)
         val btnActive = view.findViewById<MaterialButton>(R.id.btnTabActive)
@@ -49,6 +56,9 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
 
         rvActive.layoutManager = LinearLayoutManager(requireContext())
         rvActive.adapter = activeAdapter
+
+        highlightRequestId = arguments?.getString("highlightRequestId")
+
 
         // ---------- UI-only tab styling (same look as customer) ----------
         fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
@@ -132,6 +142,20 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
                 }
 
                 incomingAdapter.submitList(list)
+
+                highlightRequestId?.let { id ->
+                    val index = list.indexOfFirst { it.id == id }
+
+                    if (index != -1) {
+                        rvIncoming.scrollToPosition(index)
+                        incomingAdapter.highlightItem(id)
+
+                        // Switch to Incoming tab automatically
+                        rvIncoming.visibility = View.VISIBLE
+                        rvActive.visibility = View.GONE
+                    }
+                }
+
             }
     }
 
@@ -165,6 +189,17 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
                 }
 
                 activeAdapter.submitList(list)
+                highlightRequestId?.let { id ->
+                    val index = list.indexOfFirst { it.id == id }
+
+                    if (index != -1) {
+                        rvActive.scrollToPosition(index)
+                        activeAdapter.highlightItem(id)
+
+                        rvIncoming.visibility = View.GONE
+                        rvActive.visibility = View.VISIBLE
+                    }
+                }
             }
     }
 
@@ -184,6 +219,7 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Failed to accept", Toast.LENGTH_SHORT).show()
             }
+
     }
 
     private fun rejectRequest(req: RepairRequest) {
@@ -231,5 +267,17 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
             .addOnFailureListener {
                 Toast.makeText(requireContext(), "Failed to release", Toast.LENGTH_SHORT).show()
             }
+    }
+    // Add this inside onViewCreated or as a separate override
+    override fun onResume() {
+        super.onResume()
+        // Check if a new ID was passed while the fragment was already "Active"
+        val newId = arguments?.getString("highlightRequestId")
+        if (newId != null) {
+            highlightRequestId = newId
+            // Trigger the scroll/highlight logic again
+            listenForIncoming()
+            listenForActive()
+        }
     }
 }

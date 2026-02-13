@@ -14,12 +14,15 @@ import com.google.firebase.firestore.Query
 import androidx.navigation.fragment.findNavController
 import android.widget.ImageButton
 
+
 class CustomerRepairsFragment : Fragment(R.layout.fragment_customer_repairs) {
 
     private val firestore = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
     private lateinit var adapter: CustomerRepairsAdapter
+
+    private lateinit var rv: RecyclerView
 
     private fun confirmCompleted(reqId: String) {
         firestore.collection("requests").document(reqId)
@@ -39,54 +42,89 @@ class CustomerRepairsFragment : Fragment(R.layout.fragment_customer_repairs) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val backBtn = view.findViewById<ImageButton>(R.id.btnBackCustomerRepairs)
         backBtn.setOnClickListener { findNavController().navigateUp() }
 
-        val rv = view.findViewById<RecyclerView>(R.id.rvCustomerRepairs)
+        rv = view.findViewById(R.id.rvCustomerRepairs)
         rv.layoutManager = LinearLayoutManager(requireContext())
 
-        adapter = CustomerRepairsAdapter { row ->
-            confirmCompleted(row.id)
-        }
+        // Setup Adapter with Confirm AND Delete logic
+        adapter = CustomerRepairsAdapter(
+            onConfirm = { row -> confirmCompleted(row.id) },
+            onDelete = { row -> showDeleteConfirmation(row) }
+        )
         rv.adapter = adapter
 
         val uid = auth.currentUser?.uid ?: return
+        val highlightId = arguments?.getString("highlightRequestId")
 
-        // Backwards compatible:
-        // old mode="accepted" will now behave like "active"
-        val modeRaw = arguments?.getString("mode") ?: "all"
-        val mode = if (modeRaw == "accepted") "active" else modeRaw
-
-        val base = firestore.collection("requests")
+        // Firestore Query
+        firestore.collection("requests")
             .whereEqualTo("customerId", uid)
-
-        val query = when (mode) {
-            "closed" -> base.whereEqualTo("status", "closed")
-
-            "active" -> base.whereIn("status", listOf("pending", "accepted", "completed_pending"))
-
-            else -> base // all
-        }
-
-        query
             .orderBy("createdAt", Query.Direction.DESCENDING)
             .addSnapshotListener { snap, err ->
                 if (err != null || snap == null) return@addSnapshotListener
 
                 val list = snap.documents.mapNotNull { d ->
-                    val issue = d.getString("issue") ?: return@mapNotNull null
-                    val date = d.getString("date") ?: ""
-                    val location = d.getString("location") ?: ""
-                    val status = d.getString("status") ?: ""
-                    val mechanicName = d.getString("mechanicName") ?: ""
-
-                    CustomerRepairRow(d.id, issue, date, location, status, mechanicName)
+                    CustomerRepairRow(
+                        id = d.id,
+                        issue = d.getString("issue") ?: "",
+                        date = d.getString("date") ?: "",
+                        location = d.getString("location") ?: "",
+                        status = d.getString("status") ?: "",
+                        mechanicName = d.getString("mechanicName") ?: ""
+                    )
                 }
 
                 adapter.submitList(list)
+
+                // HIGHLIGHT LOGIC: Scroll to the item from the map
+                if (highlightId != null) {
+                    val index = list.indexOfFirst { it.id == highlightId }
+                    if (index != -1) {
+                        rv.post {
+                            rv.smoothScrollToPosition(index) // smoothScroll is nicer than scrollTo
+                            adapter.setHighlight(highlightId)
+
+                            // REMOVE HIGHLIGHT AFTER 3 SECONDS
+                            rv.postDelayed({
+                                adapter.setHighlight(null)
+                            }, 3000)
+                        }
+                    }
+                }
             }
     }
+    private fun showDeleteConfirmation(row: CustomerRepairRow) {
+        if (row.status != "pending") {
+            Toast.makeText(requireContext(), "Mechanic has already accepted this!", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Cancel Request")
+            .setMessage("Are you sure?")
+            .setPositiveButton("Delete") { _, _ ->
+                // 1. CALL THE DELETE
+                firestore.collection("requests").document(row.id).delete()
+                    .addOnSuccessListener {
+                        if (isAdded) Toast.makeText(requireContext(), "Deleted", Toast.LENGTH_SHORT).show()
+                    }
+
+                // 2. IMMEDIATE UI FIX: Remove it from the local list manually
+                // This makes it vanish the millisecond you hit the button
+                val currentList = adapter.getItems().toMutableList() // We'll add this helper to adapter
+                currentList.removeAll { it.id == row.id }
+                adapter.submitList(currentList)
+            }
+            .setNegativeButton("Back", null)
+            .show()
+    }
+
 }
+
+
 
 data class CustomerRepairRow(
     val id: String,

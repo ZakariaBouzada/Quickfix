@@ -129,8 +129,18 @@
                     app:backgroundTint="#202020"
                     app:strokeColor="#FFFF00"
                     app:strokeWidth="1dp" />
+
+
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
+
+        <fragment
+            android:id="@+id/homeMap"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_width="match_parent"
+            android:layout_height="464dp"
+            android:layout_marginTop="16dp" />
+
 
     </LinearLayout>
 </ScrollView>

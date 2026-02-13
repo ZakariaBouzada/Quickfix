@@ -8,7 +8,11 @@
     <fragment
         android:id="@+id/mechanicHomeFragment"
         android:name="com.example.bikerepairapp.ui.mechanic.MechanicHomeFragment"
-        android:label="Home" />
+        android:label="Home" >
+        <action
+            android:id="@+id/action_mechanicHomeFragment_to_mechanicRequestsFragment"
+            app:destination="@id/mechanicRequestsFragment" />
+    </fragment>
 
     <!-- your existing requests -->
     <fragment

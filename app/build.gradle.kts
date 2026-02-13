@@ -60,6 +60,10 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.10.0")
     ksp("androidx.room:room-compiler:2.6.1")
 
+    // ----- Google map ------
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
+
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

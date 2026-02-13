@@ -4,39 +4,54 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
-    android:fillViewport="true"
-    android:padding="20dp"
-    android:paddingBottom="36dp">
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:padding="20dp">
 
-        <!-- Header -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/tvProfileTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Profile"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="#FFFF00" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSettings"
+                style="@style/Widget.MaterialComponents.Button.TextButton"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_alignParentEnd="true"
+                android:padding="0dp"
+                app:icon="@android:drawable/ic_menu_preferences"
+                app:iconTint="#FFFF00"
+                app:iconGravity="textStart"
+                app:iconPadding="0dp" />
+        </RelativeLayout>
+
         <TextView
-            android:id="@+id/tvProfileTitle"
+            android:id="@+id/tvMemberSince"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Profile"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:textColor="#FFFF00" />
+            android:layout_marginTop="-4dp"
+            android:text="Joined Feb 2026"
+            android:textColor="#8E8E8E"
+            android:textSize="12sp" />
 
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="6dp"
-            android:text="Manage your account and bookings."
-            android:textColor="#BDBDBD" />
-
-        <!-- Profile card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="20dp"
             app:cardBackgroundColor="#101010"
-            app:cardCornerRadius="18dp"
+            app:cardCornerRadius="24dp"
             app:cardElevation="0dp"
             app:strokeColor="#2A2A2A"
             app:strokeWidth="1dp">
@@ -44,154 +59,197 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="16dp"
+                android:padding="20dp"
+                android:gravity="center"
                 android:orientation="vertical">
 
-                <!-- Avatar + name/email -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical">
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    app:cardCornerRadius="40dp"
+                    app:cardBackgroundColor="#191919"
+                    app:strokeColor="#FFFF00"
+                    app:strokeWidth="2dp"
+                    app:cardElevation="0dp">
+                    <TextView
+                        android:id="@+id/tvAvatarIcon"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="🚲"
+                        android:gravity="center"
+                        android:textSize="32sp" />
+                </com.google.android.material.card.MaterialCardView>
 
-                    <!-- simple avatar circle -->
-                    <com.google.android.material.card.MaterialCardView
-                        android:layout_width="44dp"
-                        android:layout_height="44dp"
-                        app:cardCornerRadius="22dp"
-                        app:cardBackgroundColor="#191919"
-                        app:strokeColor="#FFFF00"
-                        app:strokeWidth="1dp"
-                        app:cardElevation="0dp">
-
-                        <TextView
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:text="🙂"
-                            android:gravity="center"
-                            android:textSize="18sp"
-                            android:textColor="#FFFFFF" />
-                    </com.google.android.material.card.MaterialCardView>
-
-                    <LinearLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginStart="12dp"
-                        android:orientation="vertical">
-
-                        <TextView
-                            android:id="@+id/tvUserName"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Name"
-                            android:textStyle="bold"
-                            android:textSize="18sp"
-                            android:textColor="#FFFFFF" />
-
-                        <TextView
-                            android:id="@+id/tvUserEmail"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="2dp"
-                            android:text="Email"
-                            android:textColor="#BDBDBD" />
-                    </LinearLayout>
-                </LinearLayout>
-
-                <!-- Divider -->
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:layout_marginTop="14dp"
-                    android:layout_marginBottom="12dp"
-                    android:background="#2A2A2A" />
-
-                <!-- Rating (keep id) -->
                 <TextView
-                    android:id="@+id/tvRating"
+                    android:id="@+id/tvUserName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Customer rating: –"
+                    android:layout_marginTop="12dp"
+                    android:text="Name"
                     android:textColor="#FFFFFF"
+                    android:textSize="22sp"
                     android:textStyle="bold" />
 
                 <TextView
+                    android:id="@+id/tvUserEmail"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="6dp"
-                    android:text="Ratings will appear after completed repairs."
+                    android:text="Email"
                     android:textColor="#BDBDBD" />
-
-                <!-- Repairs count: keep id for your Kotlin, but hide visually -->
-                <TextView
-                    android:id="@+id/tvCompletedRepairs"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Your repairs: 0"
-                    android:textColor="#FFFFFF"
-                    android:visibility="gone" />
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Last booking card -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal"
+            android:weightSum="2">
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginEnd="8dp"
+                app:cardBackgroundColor="#101010"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#2A2A2A"
+                app:strokeWidth="1dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tvCompletedRepairs"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="0"
+                        android:textColor="#FFFF00"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Repairs"
+                        android:textColor="#BDBDBD"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                app:cardBackgroundColor="#101010"
+                app:cardCornerRadius="18dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#2A2A2A"
+                app:strokeWidth="1dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:padding="16dp"
+                    android:gravity="center"
+                    android:orientation="vertical">
+                    <TextView
+                        android:id="@+id/tvRating"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="–"
+                        android:textColor="#FFFF00"
+                        android:textSize="20sp"
+                        android:textStyle="bold" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Rating"
+                        android:textColor="#BDBDBD"
+                        android:textSize="12sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="14dp"
-            app:cardBackgroundColor="#101010"
+            android:layout_marginTop="16dp"
+            app:cardBackgroundColor="#0A0A0A"
             app:cardCornerRadius="18dp"
             app:cardElevation="0dp"
-            app:strokeColor="#2A2A2A"
+            app:strokeColor="#1A1A1A"
             app:strokeWidth="1dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:padding="16dp"
-                android:orientation="vertical">
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Advanced settings and notifications"
+                    android:textColor="#555555"
+                    android:textSize="13sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Last booking"
-                    android:textStyle="bold"
-                    android:textColor="#FFFF00"
-                    android:textSize="14sp" />
-
-                <TextView
-                    android:id="@+id/tvActivity"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="No bookings yet"
-                    android:textColor="#FFFFFF"
-                    android:lineSpacingExtra="2dp" />
-
+                    android:text="COMING SOON"
+                    android:textColor="#33FFFF00"
+                    android:textSize="10sp"
+                    android:textStyle="bold" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Footer hint -->
         <TextView
-            android:id="@+id/tvSettingsHint"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:text="Recent Activity"
+            android:textColor="#BDBDBD"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:text="Notifications and more settings coming later."
-            android:textColor="#8E8E8E" />
+            android:layout_marginTop="8dp"
+            app:cardBackgroundColor="#101010"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#2A2A2A"
+            app:strokeWidth="1dp">
+            <TextView
+                android:id="@+id/tvActivity"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="16dp"
+                android:lines="3"
+                android:maxLines="5"
+                android:ellipsize="end"
+                android:text="No recent bookings"
+                android:textColor="#FFFFFF"
+                android:lineSpacingExtra="2dp"/>
+        </com.google.android.material.card.MaterialCardView>
 
-        <!-- Logout -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/btnLogout"
             android:layout_width="match_parent"
-            android:layout_height="52dp"
-            android:layout_marginTop="18dp"
+            android:layout_height="56dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginBottom="16dp"
             android:text="Log out"
             android:textAllCaps="false"
             android:textStyle="bold"
             android:textColor="#FFFFFF"
-            app:cornerRadius="14dp"
+            app:cornerRadius="16dp"
             app:backgroundTint="#191919"
             app:strokeColor="#FFFF00"
             app:strokeWidth="1dp" />

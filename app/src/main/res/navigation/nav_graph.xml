@@ -24,18 +24,47 @@
         android:label="Booking">
 
         <action
-            android:id="@+id/action_bookingFragment_to_bookingFormFragment"
-            app:destination="@id/bookingFormFragment" />
+            android:id="@+id/action_bookingFragment_to_vehiclePickerFragment"
+            app:destination="@id/vehiclePickerFragment" />
 
         <action
             android:id="@+id/action_bookingFragment_to_customerRepairsFragment"
             app:destination="@id/customerRepairsFragment" />
     </fragment>
 
+    <!-- Vehicle type picker (new) -->
+    <fragment
+        android:id="@+id/vehiclePickerFragment"
+        android:name="com.example.bikerepairapp.ui.booking.VehiclePickerFragment"
+        android:label="Select Vehicle">
+
+        <!-- Bike → existing bike form -->
+        <action
+            android:id="@+id/action_vehiclePickerFragment_to_bookingFormFragment"
+            app:destination="@id/bookingFormFragment" />
+
+        <!-- Car or Motorbike → new vehicle form -->
+        <action
+            android:id="@+id/action_vehiclePickerFragment_to_vehicleBookingFormFragment"
+            app:destination="@id/vehicleBookingFormFragment" />
+    </fragment>
+
     <fragment
         android:id="@+id/bookingFormFragment"
         android:name="com.example.bikerepairapp.ui.booking.BookingFormFragment"
         android:label="Book a repair" />
+
+    <!-- Car / Motorbike booking form (new) -->
+    <fragment
+        android:id="@+id/vehicleBookingFormFragment"
+        android:name="com.example.bikerepairapp.ui.booking.VehicleBookingFormFragment"
+        android:label="Book a repair">
+
+        <argument
+            android:name="vehicleType"
+            android:defaultValue="Car"
+            app:argType="string" />
+    </fragment>
 
     <fragment
         android:id="@+id/profileFragment"
@@ -52,7 +81,6 @@
             app:argType="string" />
     </fragment>
 
-    <!-- ✅ Settings: fix android:name -->
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.bikerepairapp.ui.profile.SettingsFragment"

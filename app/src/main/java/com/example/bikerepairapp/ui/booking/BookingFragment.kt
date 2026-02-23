@@ -42,7 +42,7 @@ class BookingFragment : Fragment(R.layout.fragment_booking) {
         )
 
         btnOpenBookingForm.setOnClickListener {
-            findNavController().navigate(R.id.action_bookingFragment_to_bookingFormFragment)
+            findNavController().navigate(R.id.action_bookingFragment_to_vehiclePickerFragment)
         }
 
         btnOpenMyRepairs.setOnClickListener {

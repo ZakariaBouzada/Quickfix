@@ -35,10 +35,25 @@
             android:textColor="#FFFF00" />
     </FrameLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvCustomerRepairs"
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="16dp" />
+        android:layout_marginTop="16dp">
 
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvCustomerRepairs"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <TextView
+            android:id="@+id/tvEmptyState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="No repair requests yet."
+            android:textColor="#80BDBDBD"
+            android:textSize="16sp"
+            android:visibility="gone" />
+
+    </FrameLayout>
 </LinearLayout>

@@ -18,7 +18,19 @@
     <fragment
         android:id="@+id/mechanicRequestsFragment"
         android:name="com.example.bikerepairapp.ui.mechanic.MechanicRequestsFragment"
-        android:label="Requests" />
+        android:label="Requests">
+        <argument
+            android:name="highlightRequestId"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true" />
+        <argument
+            android:name="highlightStatus"
+            app:argType="string"
+            android:defaultValue="@null"
+            app:nullable="true" />
+    </fragment>
+
 
     <!-- NEW: mechanic profile (replaces customer profile for mechanic flow) -->
     <fragment

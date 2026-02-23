@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bikerepairapp.R
 import com.google.android.material.button.MaterialButton
+import android.widget.ImageView
+import coil.load
 
 
 
@@ -58,6 +60,7 @@ class ActiveRequestsAdapter(
 
         private val btnComplete: MaterialButton = itemView.findViewById(R.id.btnComplete)
         private val btnRelease: MaterialButton = itemView.findViewById(R.id.btnRelease)
+        private val ivPhoto: ImageView = itemView.findViewById(R.id.ivRequestPhoto)
 
         fun bind(
             req: RepairRequest,
@@ -76,6 +79,7 @@ class ActiveRequestsAdapter(
             val date = req.date.ifBlank { "No time" }
             val loc = req.location.ifBlank { "No location" }
 
+
             // If mechanic already completed -> waiting for customer confirmation
             val isWaitingCustomer = req.status == "completed_pending"
             if (isWaitingCustomer) {
@@ -84,6 +88,16 @@ class ActiveRequestsAdapter(
                 tvMeta.text = "Waiting for confirmation from $who"
             } else {
                 tvMeta.text = "$date • $loc"
+            }
+
+            if (!req.imageUri.isNullOrEmpty()) {
+                ivPhoto.visibility = View.VISIBLE
+                ivPhoto.load(req.imageUri) {
+                    crossfade(true)
+                    placeholder(R.drawable.placeholder_bike) // Make sure this exists or remove line
+                }
+            } else {
+                ivPhoto.visibility = View.GONE
             }
 
             // ---- Complete (primary) ----

@@ -74,23 +74,28 @@ class MechanicHomeFragment : Fragment(R.layout.fragment_mechanic_home),
         googleMap.setOnInfoWindowClickListener { marker ->
             val requestId = marker.tag as? String ?: return@setOnInfoWindowClickListener
 
-            // This is the "Magic" NavOptions that mimics the Bottom Nav bar behavior
+            // Check the snippet carefully
+            val snippet = marker.snippet ?: ""
+            // DEBUG: See exactly what the marker is telling us
+            android.util.Log.d("DEBUG_NAV", "Marker Snippet: $snippet")
+            val isAccepted = snippet.lowercase().contains("accepted", ignoreCase = true)
+            val statusToSend = if (isAccepted) "accepted" else "pending"
+
+            android.util.Log.d("DEBUG_NAV", "Status being sent: $statusToSend")
+
             val navOptions = androidx.navigation.NavOptions.Builder()
                 .setLaunchSingleTop(true)
-                .setRestoreState(true)
-                .setPopUpTo(
-                    R.id.mechanicHomeFragment, // This is your graph ID from nav_mechanic.xml
-                    inclusive = false,
-                    saveState = true
-                )
+                .setRestoreState(false)
+                .setPopUpTo(R.id.mechanicHomeFragment, inclusive = false, saveState = true)
                 .build()
 
             findNavController().navigate(
                 R.id.mechanicRequestsFragment,
                 Bundle().apply {
                     putString("highlightRequestId", requestId)
+                    putString("highlightStatus", statusToSend)
                 },
-                navOptions // Pass these options!
+                navOptions
             )
         }
     }
@@ -98,6 +103,8 @@ class MechanicHomeFragment : Fragment(R.layout.fragment_mechanic_home),
     private fun listenForBookings() {
         // Remove old listener before starting a new one to prevent memory leaks/duplicate markers
         registration?.remove()
+
+        val currentUid = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid
 
         // 3. Dynamic Firestore Query
         var query = firestore.collection("requests").whereNotEqualTo("status", "completed")
@@ -107,10 +114,18 @@ class MechanicHomeFragment : Fragment(R.layout.fragment_mechanic_home),
         }
 
         registration = query.addSnapshotListener { snapshots, _ ->
-            if (snapshots == null) return@addSnapshotListener
+            if (snapshots == null || !::googleMap.isInitialized) return@addSnapshotListener
             googleMap.clear()
 
             for (doc in snapshots) {
+
+                val rejectedBy = doc.get("rejectedBy") as? List<*> ?: emptyList<Any>()
+
+                // If I have rejected/released booking, skip it!
+                if (currentUid != null && rejectedBy.contains(currentUid)) {
+                    continue
+                }
+
                 val lat = doc.getDouble("locationLat")
                 val lng = doc.getDouble("locationLng")
                 val issue = doc.getString("issue")
@@ -134,6 +149,20 @@ class MechanicHomeFragment : Fragment(R.layout.fragment_mechanic_home),
                     marker?.tag = doc.id
                 }
             }
+        }
+    }
+    override fun onPause() {
+        super.onPause()
+        // Stop listening for map markers when we leave the screen
+        registration?.remove()
+        registration = null
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Restart listening when we come back
+        if (::googleMap.isInitialized) {
+            listenForBookings()
         }
     }
 }

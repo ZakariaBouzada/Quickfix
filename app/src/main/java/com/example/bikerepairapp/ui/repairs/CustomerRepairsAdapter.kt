@@ -56,28 +56,20 @@ class CustomerRepairsAdapter(
         private val btnConfirm: MaterialButton? = itemView.findViewById(R.id.btnConfirmRepair)
         private val btnDelete: ImageButton? = itemView.findViewById(R.id.btnDeleteRepair)
 
-        fun bind(
-            row: CustomerRepairRow,
-            onConfirm: ((CustomerRepairRow) -> Unit)?,
-            onDelete: ((CustomerRepairRow) -> Unit)?
-        ) {
+        fun bind(row: CustomerRepairRow, onConfirm: ((CustomerRepairRow) -> Unit)?, onDelete: ((CustomerRepairRow) -> Unit)?) {
             tvIssue.text = row.issue
             tvMeta.text = "${row.date} • ${row.location}"
 
-            // Long click still works as a backup
-            itemView.setOnLongClickListener {
-                onDelete?.invoke(row)
-                true
-            }
-
-            // Visible Delete Button
-            btnDelete?.setOnClickListener {
-                onDelete?.invoke(row)
-            }
-
-            // Hide delete if not pending
+            // Handle Button Visibilities
+            btnConfirm?.visibility = if (row.status == "completed_pending") View.VISIBLE else View.GONE
             btnDelete?.visibility = if (row.status == "pending") View.VISIBLE else View.GONE
 
+            // Handle Listeners
+            btnConfirm?.setOnClickListener { onConfirm?.invoke(row) }
+            btnDelete?.setOnClickListener { onDelete?.invoke(row) }
+            itemView.setOnLongClickListener { onDelete?.invoke(row); true }
+
+            // Handle Status Text (Pretty print)
             val prettyStatus = when (row.status) {
                 "pending" -> "Pending"
                 "accepted" -> "Accepted"
@@ -92,9 +84,6 @@ class CustomerRepairsAdapter(
             } else {
                 "Status: $prettyStatus"
             }
-
-            btnConfirm?.visibility = if (row.status == "completed_pending") View.VISIBLE else View.GONE
-            btnConfirm?.setOnClickListener { onConfirm?.invoke(row) }
         }
     }
 }

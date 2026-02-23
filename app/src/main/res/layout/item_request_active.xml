@@ -25,6 +25,13 @@
             android:textSize="16sp"
             android:textColor="#FFFFFF"
             android:includeFontPadding="false" />
+        <ImageView
+            android:id="@+id/ivRequestPhoto"
+            android:layout_width="match_parent"
+            android:layout_height="180dp"
+            android:scaleType="centerCrop"
+            android:visibility="gone"
+            android:layout_marginTop="8dp" />
 
         <TextView
             android:id="@+id/tvMeta"
@@ -37,6 +44,8 @@
             android:includeFontPadding="false"
             android:maxLines="2"
             android:ellipsize="end" />
+
+
 
         <!-- Status hint (optional, only shown when completed) -->
         <TextView

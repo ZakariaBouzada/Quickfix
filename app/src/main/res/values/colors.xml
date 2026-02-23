@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="quickfix_yellow">#FFFF00</color>
-    <color name="quickfix_purple">#FF6200EE</color>
+    <color name="quickfix_purple">#6200EE</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
 </resources>

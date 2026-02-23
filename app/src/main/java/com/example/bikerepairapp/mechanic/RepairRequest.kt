@@ -8,7 +8,8 @@ data class RepairRequest(
     val status: String = "",
     val customerEmail: String = "",
     val customerId: String = "",
+    val customerName: String = "",
     val mechanicId: String? = null,
     val mechanicName: String? = null,
-    val customerName: String = ""
+    val imageUri: String? = null
 )

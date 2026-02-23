@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
@@ -29,29 +30,44 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import de.timonknispel.ktloadingbutton.KTLoadingButton
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.MultipartBody
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONObject
+import java.io.File
 
 class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
 
     private var selectedImageUri: Uri? = null
     private var selectedProblemType: String = "Tires"
-
-    // Keeping these so you don't lose work, but we won't use "confirm completed" now
     private var lastRequestId: String? = null
     private var requestListener: ListenerRegistration? = null
 
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
-
     private var successPlayer: MediaPlayer? = null
+
+    private val takePictureLauncher = registerForActivityResult(
+        ActivityResultContracts.TakePicture()
+    ) { success ->
+        if (success && selectedImageUri != null) {
+            val imageView = view?.findViewById<ImageView>(R.id.ivPhotoPreview)
+            imageView?.visibility = View.VISIBLE
+            imageView?.setImageURI(selectedImageUri)
+        }
+    }
 
     private val pickImageLauncher = registerForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         selectedImageUri = uri
-
         val root = view ?: return@registerForActivityResult
         val imageView = root.findViewById<ImageView>(R.id.ivPhotoPreview)
-
         if (uri != null) {
             imageView.visibility = View.VISIBLE
             imageView.setImageURI(uri)
@@ -59,17 +75,27 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
             imageView.visibility = View.GONE
         }
     }
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            // Now that we have permission, trigger the camera logic again
+            val uri = createImageUri()
+            if (uri != null) {
+                selectedImageUri = uri
+                takePictureLauncher.launch(uri)
+            }
+        } else {
+            Toast.makeText(requireContext(), "Camera permission is required to take photos", Toast.LENGTH_SHORT).show()
+        }
+    }
 
     override fun onDestroyView() {
         requestListener?.remove()
         requestListener = null
-
         successPlayer?.release()
         successPlayer = null
-
-        // Reset ActionBar arrow so other screens don't get stuck with it
         (requireActivity() as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(false)
-
         super.onDestroyView()
     }
 
@@ -81,31 +107,37 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
             super.onOptionsItemSelected(item)
         }
     }
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        firestore = FirebaseFirestore.getInstance()
+        auth = FirebaseAuth.getInstance()
 
-        // Handle device back
         requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
             findNavController().navigateUp()
         }
 
-        // PNG back button in your XML
         val backBtn = view.findViewById<ImageButton>(R.id.btnBackBookingForm)
         backBtn.setOnClickListener { findNavController().navigateUp() }
 
-        // (Optional) If you still want the ActionBar arrow too
         (requireActivity() as? AppCompatActivity)?.supportActionBar?.setDisplayHomeAsUpEnabled(true)
         setHasOptionsMenu(true)
 
         val dateTimeInput = view.findViewById<EditText>(R.id.etDateTime)
         val locationInput = view.findViewById<EditText>(R.id.etLocation)
         val descInput = view.findViewById<EditText>(R.id.etDescription)
-
+        // Check if we came from a map pin drop
+        val prefilledAddress = arguments?.getString("prefillAddress")
+        if (!prefilledAddress.isNullOrEmpty()) {
+            locationInput.setText(prefilledAddress)
+        }
         val confirmButton = view.findViewById<KTLoadingButton>(R.id.btnConfirm)
         confirmButton.reset()
 
-        // These exist in your XML right now — keep but hide on this screen
         val myBookingHeader = view.findViewById<TextView>(R.id.tvMyBookingHeader)
         val statusTitle = view.findViewById<TextView>(R.id.tvStatusTitle)
         val statusDetails = view.findViewById<TextView>(R.id.tvStatusDetails)
@@ -115,30 +147,39 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
         statusDetails.visibility = View.GONE
 
         val addPhotoButton = view.findViewById<MaterialButton>(R.id.btnAddPhoto)
-        addPhotoButton.setOnClickListener { pickImageLauncher.launch("image/*") }
+        addPhotoButton.setOnClickListener {
+            val options = arrayOf("Take Photo", "Choose from Gallery", "Cancel")
+            val builder = android.app.AlertDialog.Builder(requireContext())
+            builder.setTitle("Add Photo")
+            builder.setItems(options) { dialog, which ->
+                when (which) {
+                    0 -> {
+                        if (androidx.core.content.ContextCompat.checkSelfPermission(
+                                requireContext(), android.Manifest.permission.CAMERA) == android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                            val uri = createImageUri()
+                            selectedImageUri = uri
+                            takePictureLauncher.launch(uri!!)
+                        } else {
+                            requestPermissionLauncher.launch(android.Manifest.permission.CAMERA)
+                        }
+                    }
+                    1 -> pickImageLauncher.launch("image/*")
+                    2 -> dialog.dismiss()
+                }
+            }
+            builder.show()
+        }
 
         val btnTires = view.findViewById<MaterialButton>(R.id.btnTires)
         val btnChain = view.findViewById<MaterialButton>(R.id.btnChain)
         val btnOther = view.findViewById<MaterialButton>(R.id.btnOther)
 
-        // Confirm-completed exists in XML — keep but hide for now
-        val btnConfirmCompleted = view.findViewById<MaterialButton>(R.id.btnConfirmCompleted)
-        btnConfirmCompleted.visibility = View.GONE
-
         val yellow = Color.parseColor("#FFFF00")
         val dark = Color.parseColor("#202020")
-
-
-// Check if we came from a map pin drop
-        val prefilledAddress = arguments?.getString("prefillAddress")
-        if (!prefilledAddress.isNullOrEmpty()) {
-            locationInput.setText(prefilledAddress)
-        }
 
         fun styleSelected(b: MaterialButton) {
             b.backgroundTintList = ColorStateList.valueOf(yellow)
             b.setTextColor(Color.BLACK)
-            b.strokeWidth = 0
         }
 
         fun styleUnselected(b: MaterialButton) {
@@ -153,7 +194,6 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
             styleUnselected(btnTires)
             styleUnselected(btnChain)
             styleUnselected(btnOther)
-
             when (type) {
                 "Tires" -> styleSelected(btnTires)
                 "Chain" -> styleSelected(btnChain)
@@ -166,310 +206,152 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
         btnChain.setOnClickListener { applyProblemSelection("Chain") }
         btnOther.setOnClickListener { applyProblemSelection("Other") }
 
-        val db = AppDatabase.getDatabase(requireContext())
-        val ticketDao = db.ticketDao()
-
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
-        // Keeping your local ticket logic (hidden UI, but not deleting work)
-        lifecycleScope.launch {
-            val latestTicket = ticketDao.getLatestTicket()
-            if (latestTicket != null) {
-                showStatus(myBookingHeader, statusTitle, statusDetails, latestTicket)
-            }
-        }
-
-        // SUBMIT booking
         confirmButton.setOnClickListener {
-            // Always start from a clean state on click
-            // (prevents "stuck spinning" from any earlier attempt)
-            confirmButton.reset()
-            confirmButton.isEnabled = true
-
             val whenText = dateTimeInput.text.toString().trim()
             val whereText = locationInput.text.toString().trim()
             val issueText = descInput.text.toString().trim()
-            // Convert address -> lat/lng
+
             val latLng = getLatLngFromAddress(whereText)
-
             if (latLng == null) {
-                Toast.makeText(requireContext(), "Could not find that address", Toast.LENGTH_SHORT).show()
-
-                confirmButton.doResult(false)
-                confirmButton.postDelayed({
-                    confirmButton.reset()
-                    confirmButton.isEnabled = true
-                }, 1000)
-
+                Toast.makeText(requireContext(), "Could not find address", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            // Validation (if invalid: show toast + keep button normal)
             if (whenText.isBlank() || whereText.isBlank() || issueText.isBlank()) {
-                Toast.makeText(requireContext(), "Please fill all fields", Toast.LENGTH_SHORT).show()
-
-                // Optional: flash fail state quickly
-                confirmButton.doResult(false)
-                confirmButton.postDelayed({
-                    confirmButton.reset()
-                    confirmButton.isEnabled = true
-                }, 600)
-
+                Toast.makeText(requireContext(), "Fill all fields", Toast.LENGTH_SHORT).show()
                 return@setOnClickListener
             }
 
-            val currentUser = auth.currentUser
-            val customerId = currentUser?.uid
-            val customerEmail = currentUser?.email
+            val currentUser = auth.currentUser ?: return@setOnClickListener
 
-            if (customerId == null) {
-                Toast.makeText(requireContext(), "Not logged in", Toast.LENGTH_SHORT).show()
-
-                confirmButton.doResult(false)
-                confirmButton.postDelayed({
-                    confirmButton.reset()
-                    confirmButton.isEnabled = true
-                }, 600)
-
-                return@setOnClickListener
-            }
-
-            // Now we are actually submitting → start loading
             confirmButton.isEnabled = false
             confirmButton.startLoading()
 
-            // 1) Room (local)
-            val ticket = BookingTicket(
-                id = 0,
-                issue = issueText,
-                date = whenText,
-                location = whereText,
-                status = "Requested",
-                imageUri = selectedImageUri?.toString()
-            )
+            firestore.collection("users").document(currentUser.uid).get()
+                .addOnCompleteListener { nameTask ->
+                    val snap = if (nameTask.isSuccessful) nameTask.result else null
+                    val customerName = snap?.getString("name") ?: currentUser.displayName ?: "Customer"
 
-            lifecycleScope.launch {
-                ticketDao.insertTicket(ticket)
-                showStatus(myBookingHeader, statusTitle, statusDetails, ticket)
+                    val uriToUpload = selectedImageUri
+                    if (uriToUpload != null) {
+                        // Using the new direct upload function
+                        uploadImageToStorage(uriToUpload) { cloudUrl ->
+                            if (cloudUrl != null) {
+                                saveBookingToFirestore(cloudUrl, customerName, latLng, whenText, whereText, issueText, confirmButton)
+                            } else {
+                                handleBookingFailure(confirmButton, "Photo upload failed")
+                            }
+                        }
+                    } else {
+                        saveBookingToFirestore(null, customerName, latLng, whenText, whereText, issueText, confirmButton)
+                    }
+                }
+        }
+    }
+
+    private fun uploadImageToStorage(uri: Uri, onComplete: (String?) -> Unit) {
+        val client = OkHttpClient()
+        val context = requireContext()
+
+        lifecycleScope.launch(Dispatchers.IO) {
+            try {
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val bytes = inputStream?.readBytes() ?: throw Exception("File empty")
+
+                val mediaType = "image/jpeg".toMediaTypeOrNull()
+
+                // Replace YOUR_API_KEY_HERE with your key from imgbb.com
+                val apiKey = "11b91dd2094a5194a612e6408e0392c1"
+
+                val requestBody = MultipartBody.Builder()
+                    .setType(MultipartBody.FORM)
+                    .addFormDataPart("image", "repair.jpg", bytes.toRequestBody(mediaType))
+                    .build()
+
+                val request = Request.Builder()
+                    .url("https://api.imgbb.com/1/upload?key=$apiKey")
+                    .post(requestBody)
+                    .build()
+
+                val response = client.newCall(request).execute()
+                val responseString = response.body?.string() ?: ""
+
+                if (response.isSuccessful) {
+                    val jsonResponse = JSONObject(responseString)
+                    val url = jsonResponse.getJSONObject("data").getString("url")
+                    withContext(Dispatchers.Main) { onComplete(url) }
+                } else {
+                    Log.e("Upload", "Failed: $responseString")
+                    withContext(Dispatchers.Main) { onComplete(null) }
+                }
+            } catch (e: Exception) {
+                Log.e("Upload", "Error: ${e.message}")
+                withContext(Dispatchers.Main) { onComplete(null) }
             }
-
-            // 2) Firestore
-            firestore.collection("users").document(customerId).get()
-                .addOnSuccessListener { snap ->
-                    val customerName =
-                        snap.getString("name")
-                            ?: currentUser.displayName
-                            ?: (customerEmail ?: "Customer")
-
-                    val requestDoc = hashMapOf(
-                        "customerId" to customerId,
-                        "customerEmail" to customerEmail,
-                        "customerName" to customerName,
-                        "issue" to issueText,
-                        "date" to whenText,
-                        "locationText" to whereText,
-                        "locationLat" to latLng.first,
-                        "locationLng" to latLng.second,
-                        "status" to "pending",
-                        "imageUri" to (selectedImageUri?.toString()),
-                        "createdAt" to FieldValue.serverTimestamp(),
-                        "mechanicId" to null,
-                        "mechanicName" to null
-                    )
-
-                    firestore.collection("requests")
-                        .add(requestDoc)
-                        .addOnSuccessListener { docRef ->
-                            lastRequestId = docRef.id
-                            handleBookingSuccess(view, confirmButton)
-                        }
-                        .addOnFailureListener { e ->
-                            handleBookingFailure(confirmButton, e.message)
-                        }
-                }
-                .addOnFailureListener { e ->
-                    handleBookingFailure(confirmButton, e.message)
-                }
-
-
-            .addOnFailureListener { e ->
-                    // fallback: use email/displayName as name
-                    val fallbackName = currentUser.displayName ?: (customerEmail ?: "Customer")
-
-                    val requestDoc = hashMapOf(
-                        "customerId" to customerId,
-                        "customerEmail" to customerEmail,
-                        "customerName" to fallbackName,
-                        "issue" to issueText,
-                        "date" to whenText,
-                        "locationText" to whereText,
-                        "locationLat" to latLng.first,
-                        "locationLng" to latLng.second,
-                        "status" to "pending",
-                        "imageUri" to (selectedImageUri?.toString()),
-                        "createdAt" to FieldValue.serverTimestamp(),
-                        "mechanicId" to null,
-                        "mechanicName" to null
-                    )
-
-                    firestore.collection("requests")
-                        .add(requestDoc)
-                        .addOnSuccessListener { docRef ->
-                            lastRequestId = docRef.id
-                            handleBookingSuccess(view, confirmButton)
-                        }
-                        .addOnFailureListener { err ->
-                            handleBookingFailure(confirmButton, err.message ?: e.message)
-                        }
-                }
         }
     }
 
-    private fun handleBookingFailure(confirmButton: KTLoadingButton, msg: String?) {
-        Toast.makeText(requireContext(), "Failed: ${msg ?: "Unknown error"}", Toast.LENGTH_LONG).show()
-
-        // KTLoadingButton API
-        confirmButton.doResult(false)
-
-        confirmButton.postDelayed({
-            confirmButton.reset()
-            confirmButton.isEnabled = true
-        }, 1200)
-    }
-
-    private fun handleBookingSuccess(rootView: View, confirmButton: KTLoadingButton) {
-        Toast.makeText(requireContext(), "Booking sent ✅", Toast.LENGTH_SHORT).show()
-
-        // Play sound (booking.mp3 -> res/raw/booking.mp3 => R.raw.booking)
-        successPlayer?.release()
-        successPlayer = MediaPlayer.create(requireContext(), R.raw.booking)
-        successPlayer?.setOnCompletionListener {
-            it.release()
-            if (successPlayer === it) successPlayer = null
-        }
-        successPlayer?.start()
-
-        // KTLoadingButton API
-        confirmButton.doResult(true)
-
-        rootView.postDelayed({
-            findNavController().navigateUp()
-        }, 350)
-    }
-
-    // Keeping these so you don't lose code; not used right now since "confirm completed" is later
-    @SuppressLint("SetTextI18n")
-    private fun attachCustomerRequestListener(
-        myBookingHeader: TextView,
-        statusTitle: TextView,
-        statusDetails: TextView,
-        btnConfirmCompleted: MaterialButton
+    private fun saveBookingToFirestore(
+        imageUrl: String?, name: String, latLng: Pair<Double, Double>,
+        whenT: String, whereT: String, issue: String, btn: KTLoadingButton
     ) {
         val uid = auth.currentUser?.uid ?: return
+        val requestDoc = hashMapOf(
+            "customerId" to uid,
+            "customerName" to name,
+            "problemType" to selectedProblemType,
+            "issue" to issue,
+            "date" to whenT,
+            "locationText" to whereT,
+            "locationLat" to latLng.first,
+            "locationLng" to latLng.second,
+            "status" to "pending",
+            "imageUri" to imageUrl,
+            "createdAt" to FieldValue.serverTimestamp(),
+            "mechanicId" to null,
+            "mechanicName" to null,
+            "rejectedBy" to arrayListOf<String>()
+        )
 
-        requestListener?.remove()
-        requestListener = null
-
-        requestListener = firestore.collection("requests")
-            .whereEqualTo("customerId", uid)
-            .addSnapshotListener { snap, _ ->
-                if (snap == null) return@addSnapshotListener
-                if (!isAdded) return@addSnapshotListener
-
-                val latestDoc = snap.documents.maxByOrNull {
-                    it.getTimestamp("createdAt")?.toDate()?.time ?: 0L
-                } ?: run {
-                    btnConfirmCompleted.visibility = View.GONE
-                    return@addSnapshotListener
-                }
-
-                lastRequestId = latestDoc.id
-
-                val issue = latestDoc.getString("issue") ?: "—"
-                val date = latestDoc.getString("date") ?: "—"
-                val location = latestDoc.getString("location") ?: "—"
-                val status = latestDoc.getString("status") ?: "pending"
-                val mechanicName = latestDoc.getString("mechanicName") ?: "Not assigned yet"
-
-                btnConfirmCompleted.visibility = View.GONE
-
-                myBookingHeader.visibility = View.VISIBLE
-                statusTitle.visibility = View.VISIBLE
-                statusDetails.visibility = View.VISIBLE
-
-                statusDetails.text = """
-                    Issue: $issue
-                    Time: $date
-                    Location: $location
-
-                    Status: $status
-                    Mechanic: $mechanicName
-                """.trimIndent()
-            }
+        firestore.collection("requests").add(requestDoc)
+            .addOnSuccessListener { handleBookingSuccess(requireView(), btn) }
+            .addOnFailureListener { e -> handleBookingFailure(btn, e.message) }
     }
 
-    private fun confirmCompleted(reqId: String) {
-        firestore.collection("requests").document(reqId)
-            .update(
-                mapOf(
-                    "status" to "closed",
-                    "closedAt" to FieldValue.serverTimestamp()
-                )
-            )
-            .addOnSuccessListener {
-                Toast.makeText(requireContext(), "Confirmed ✅", Toast.LENGTH_SHORT).show()
-            }
-            .addOnFailureListener { e ->
-                Toast.makeText(requireContext(), "Failed: ${e.message}", Toast.LENGTH_SHORT).show()
-            }
+    private fun handleBookingFailure(btn: KTLoadingButton, msg: String?) {
+        Toast.makeText(requireContext(), msg ?: "Error", Toast.LENGTH_SHORT).show()
+        btn.doResult(false)
+        btn.postDelayed({ btn.reset(); btn.isEnabled = true }, 1000)
     }
 
-    @SuppressLint("SetTextI18n")
-    private fun showStatus(
-        header: TextView,
-        title: TextView,
-        details: TextView,
-        ticket: BookingTicket
-    ) {
-        // Hidden on this screen, but keeping your logic
-        header.visibility = View.GONE
-        title.visibility = View.GONE
-        details.visibility = View.GONE
-
-        details.text = """
-            Issue: ${ticket.issue}
-            Time: ${ticket.date}
-            Location: ${ticket.location}
-
-            Status: ${ticket.status}
-            Mechanic: Not assigned yet (local)
-        """.trimIndent()
+    private fun handleBookingSuccess(view: View, btn: KTLoadingButton) {
+        btn.doResult(true)
+        successPlayer = MediaPlayer.create(requireContext(), R.raw.booking)
+        successPlayer?.start()
+        view.postDelayed({ findNavController().navigateUp() }, 500)
     }
+
     private fun getLatLngFromAddress(address: String): Pair<Double, Double>? {
         return try {
             val geocoder = android.location.Geocoder(requireContext())
+            val results = geocoder.getFromLocationName("$address, Turku, Finland", 1)
+            if (!results.isNullOrEmpty()) Pair(results[0].latitude, results[0].longitude) else null
+        } catch (e: Exception) { null }
+    }
 
-            // Force Turku context
-            val fullAddress = "$address, Turku, Finland"
-
-            val results = geocoder.getFromLocationName(fullAddress, 1)
-
-            if (!results.isNullOrEmpty()) {
-                val location = results[0]
-
-                // Extra safety: ensure it's actually Turku
-                if (location.locality == "Turku" ||
-                    location.adminArea == "Southwest Finland") {
-
-                    Pair(location.latitude, location.longitude)
-                } else {
-                    null
-                }
-            } else null
-
-        } catch (e: Exception) {
-            null
+    private fun createImageUri(): Uri? {
+        val contentValues = android.content.ContentValues().apply {
+            put(android.provider.MediaStore.MediaColumns.DISPLAY_NAME, "repair_${System.currentTimeMillis()}.jpg")
+            put(android.provider.MediaStore.MediaColumns.MIME_TYPE, "image/jpeg")
         }
+        return requireContext().contentResolver.insert(android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues)
+    }
+
+    @SuppressLint("SetTextI18n")
+    private fun showStatus(h: TextView, t: TextView, d: TextView, ticket: BookingTicket) {
+        h.visibility = View.GONE
     }
 }

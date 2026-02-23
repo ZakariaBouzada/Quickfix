@@ -53,6 +53,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.firebase:firebase-analytics")
 
+
     // -------- ROOM DATABASE --------
     implementation("androidx.room:room-runtime:2.6.1")
     implementation("androidx.room:room-ktx:2.6.1")
@@ -62,6 +63,11 @@ dependencies {
 
     // ----- Google map ------
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+
+    // ---- ImageKit storage for images ---- //
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+    implementation("io.coil-kt:coil:2.5.0")
+
 
 
     testImplementation(libs.junit)

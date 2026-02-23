@@ -44,7 +44,7 @@ class MechanicCompletedFragment : Fragment(R.layout.fragment_mechanic_completed)
         // If later you switch to "completed_by_mechanic", change this filter only.
         db.collection("requests")
             .whereEqualTo("mechanicId", uid)
-            .whereEqualTo("status", "closed")
+            .whereIn("status", listOf("closed","completed_pending"))
             .addSnapshotListener { snap, _ ->
                 if (snap == null) return@addSnapshotListener
 
@@ -53,7 +53,7 @@ class MechanicCompletedFragment : Fragment(R.layout.fragment_mechanic_completed)
                         id = doc.id,
                         issue = doc.getString("issue") ?: return@mapNotNull null,
                         date = doc.getString("date") ?: "",
-                        location = doc.getString("location") ?: "",
+                        location = doc.getString("locationText") ?: "",
                         status = doc.getString("status") ?: "closed",
                         customerEmail = doc.getString("customerEmail") ?: "",
                         customerId = doc.getString("customerId") ?: "",

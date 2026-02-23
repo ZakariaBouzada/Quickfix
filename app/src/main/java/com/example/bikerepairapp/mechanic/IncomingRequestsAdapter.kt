@@ -9,6 +9,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bikerepairapp.R
 import com.google.android.material.button.MaterialButton
+import android.widget.ImageView
+import coil.load
 
 
 
@@ -39,12 +41,11 @@ class IncomingRequestsAdapter(
         val item = items[position]
         holder.bind(item, onAccept, onReject)
 
-        if (item.id == highlightedId) {
-            holder.itemView.setBackgroundColor(Color.parseColor("#333300"))
-        } else {
-            holder.itemView.setBackgroundColor(Color.TRANSPARENT)
-        }
-
+        // Highlight logic
+        holder.itemView.setBackgroundColor(
+            if (item.id == highlightedId) Color.parseColor("#333300")
+            else Color.TRANSPARENT
+        )
     }
     fun highlightItem(id: String) {
         highlightedId = id
@@ -57,6 +58,7 @@ class IncomingRequestsAdapter(
         private val tvMeta: TextView = itemView.findViewById(R.id.tvMeta)
         private val btnAccept: MaterialButton = itemView.findViewById(R.id.btnAccept)
         private val btnReject: MaterialButton = itemView.findViewById(R.id.btnReject)
+        private val ivPhoto: ImageView = itemView.findViewById(R.id.ivRequestPhoto)
 
         fun bind(
             req: RepairRequest,
@@ -68,6 +70,16 @@ class IncomingRequestsAdapter(
             val date = req.date.ifBlank { "No time" }
             val loc = req.location.ifBlank { "No location" }
             tvMeta.text = "$date • $loc"
+
+            if (!req.imageUri.isNullOrEmpty()) {
+                ivPhoto.visibility = View.VISIBLE
+                ivPhoto.load(req.imageUri) {
+                    crossfade(true)
+                    placeholder(R.drawable.placeholder_bike) // Make sure this exists or remove line
+                }
+            } else {
+                ivPhoto.visibility = View.GONE
+            }
 
             // ---- UI-only styling ----
             val yellow = Color.parseColor("#FFFF00")

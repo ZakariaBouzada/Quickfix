@@ -125,8 +125,22 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
     private fun listenForIncoming() {
         val uid = currentUid() ?: return
 
-        // NOTE: querying "mechanicId == null" is unreliable.
-        // Better: query pending requests then filter by mechanicId null/missing.
+        // Load mechanic's preferred vehicle types first, then start listening
+        db.collection("users").document(uid).get()
+            .addOnSuccessListener { userSnap ->
+                @Suppress("UNCHECKED_CAST")
+                val prefs = userSnap.get("preferredVehicles") as? List<String>
+                    ?: listOf("Bike", "Car", "Motorbike")  // default = show all
+
+                startIncomingListener(uid, prefs)
+            }
+            .addOnFailureListener {
+                // If we can't load prefs, show all
+                startIncomingListener(uid, listOf("Bike", "Car", "Motorbike"))
+            }
+    }
+
+    private fun startIncomingListener(uid: String, preferredVehicles: List<String>) {
         db.collection("requests")
             .whereEqualTo("status", "pending")
             .addSnapshotListener { snap, e ->
@@ -139,6 +153,11 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
                     val mechanicId = doc.getString("mechanicId")
                     if (!mechanicId.isNullOrBlank()) return@mapNotNull null
 
+                    // Vehicle type filter:
+                    // - if request has no vehicleType (old bike-only requests) treat it as "Bike"
+                    val vehicleType = doc.getString("vehicleType") ?: "Bike"
+                    if (!preferredVehicles.contains(vehicleType)) return@mapNotNull null
+
                     RepairRequest(
                         id = doc.id,
                         issue = doc.getString("issue") ?: return@mapNotNull null,
@@ -150,7 +169,9 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
                         mechanicId = doc.getString("mechanicId"),
                         mechanicName = doc.getString("mechanicName"),
                         customerName = doc.getString("customerName") ?: "",
-                        chatId = doc.getString("chatId")
+                        chatId = doc.getString("chatId"),
+                        vehicleType = vehicleType,
+                        locationGeo = doc.getGeoPoint("locationGeo")
                     )
                 }
 
@@ -183,7 +204,9 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
                         mechanicId = doc.getString("mechanicId"),
                         mechanicName = doc.getString("mechanicName"),
                         customerName = doc.getString("customerName") ?: "",
-                        chatId = doc.getString("chatId")
+                        chatId = doc.getString("chatId"),
+                        vehicleType = doc.getString("vehicleType"),
+                        locationGeo = doc.getGeoPoint("locationGeo")
                     )
                 }
 

@@ -9,7 +9,6 @@ import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.TextView
 import android.widget.Toast
@@ -90,18 +89,18 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
         val lat = data.getDoubleExtra(OsmMapPickerActivity.EXTRA_LAT, Double.NaN)
         val lng = data.getDoubleExtra(OsmMapPickerActivity.EXTRA_LNG, Double.NaN)
 
-
         pickedAddress = address
         pickedLat = if (!lat.isNaN()) lat else null
         pickedLng = if (!lng.isNaN()) lng else null
 
         val root = view ?: return@registerForActivityResult
-        val locationInput = root.findViewById<EditText>(R.id.etLocation)
         val hint = root.findViewById<TextView>(R.id.tvPickedAddressHint)
+        val mapBtn = root.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnPickOnMap)
 
         if (!address.isNullOrBlank()) {
-            locationInput.setText(address)
-            hint.text = "Picked from map ✅"
+            hint.text = "📍 $address"
+            hint.setTextColor(android.graphics.Color.parseColor("#CCCCCC"))
+            mapBtn.text = "📍  Change location"
         } else {
             hint.text = "Could not resolve address — try another point"
         }
@@ -226,7 +225,6 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
         }
 
 
-        val locationInput = view.findViewById<EditText>(R.id.etLocation)
         val descInput = view.findViewById<EditText>(R.id.etDescription)
 
         val confirmButton = view.findViewById<KTLoadingButton>(R.id.btnConfirm)
@@ -244,13 +242,11 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
         val addPhotoButton = view.findViewById<MaterialButton>(R.id.btnAddPhoto)
         addPhotoButton.setOnClickListener { pickImageLauncher.launch("image/*") }
 
-        // NEW: pick on map button (exists in the updated XML)
-        val btnPickOnMap = view.findViewById<ImageButton>(R.id.btnPickOnMap)
-
-
-        btnPickOnMap.setOnClickListener {
-            pickOnMapLauncher.launch(Intent(requireContext(), OsmMapPickerActivity::class.java))
-        }
+        // Map picker button
+        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnPickOnMap)
+            .setOnClickListener {
+                pickOnMapLauncher.launch(Intent(requireContext(), OsmMapPickerActivity::class.java))
+            }
 
         val btnTires = view.findViewById<MaterialButton>(R.id.btnTires)
         val btnChain = view.findViewById<MaterialButton>(R.id.btnChain)
@@ -315,19 +311,21 @@ class BookingFormFragment : Fragment(R.layout.fragment_booking_form) {
             confirmButton.isEnabled = true
 
             val whenText = dateTimeInput.text.toString().trim()
-            val whereText = locationInput.text.toString().trim()
+            val whereText = pickedAddress ?: ""
             val issueText = descInput.text.toString().trim()
 
-            // Validation
-            if (whenText.isBlank() || whereText.isBlank() || issueText.isBlank()) {
-                Toast.makeText(requireContext(), "Please fill all fields", Toast.LENGTH_SHORT).show()
-
+            // Validation — location must be picked from map
+            if (whenText.isBlank() || issueText.isBlank()) {
+                Toast.makeText(requireContext(), "Please fill in date/time and description", Toast.LENGTH_SHORT).show()
                 confirmButton.doResult(false)
-                confirmButton.postDelayed({
-                    confirmButton.reset()
-                    confirmButton.isEnabled = true
-                }, 600)
+                confirmButton.postDelayed({ confirmButton.reset(); confirmButton.isEnabled = true }, 600)
+                return@setOnClickListener
+            }
 
+            if (pickedLat == null || pickedLng == null) {
+                Toast.makeText(requireContext(), "Please pick a location on the map", Toast.LENGTH_SHORT).show()
+                confirmButton.doResult(false)
+                confirmButton.postDelayed({ confirmButton.reset(); confirmButton.isEnabled = true }, 600)
                 return@setOnClickListener
             }
 

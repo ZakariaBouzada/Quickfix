@@ -12,6 +12,7 @@ import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.Spinner
 import android.widget.TextView
+import com.google.android.material.button.MaterialButton
 import android.widget.Toast
 import androidx.activity.addCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -99,12 +100,13 @@ class VehicleBookingFormFragment : Fragment(R.layout.fragment_booking_form_vehic
         pickedLng = if (!lng.isNaN()) lng else null
 
         val root = view ?: return@registerForActivityResult
-        val locationInput = root.findViewById<TextInputEditText>(R.id.etLocationV)
         val hint = root.findViewById<TextView>(R.id.tvPickedAddressHintV)
+        val mapBtn = root.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnPickOnMapV)
 
         if (!address.isNullOrBlank()) {
-            locationInput.setText(address)
-            hint.text = "Picked from map ✅"
+            hint.text = "📍 $address"
+            hint.setTextColor(android.graphics.Color.parseColor("#CCCCCC"))
+            mapBtn.text = "📍  Change location"
         } else {
             hint.text = "Could not resolve address — try another point"
         }
@@ -129,14 +131,14 @@ class VehicleBookingFormFragment : Fragment(R.layout.fragment_booking_form_vehic
             findNavController().navigateUp()
         }
 
-        // Brand spinner
+        // Brand spinner — white text on dark bg
         val spinner = view.findViewById<Spinner>(R.id.spinnerBrand)
         val brands = if (vehicleType == "Car") carBrands else motorbikeBrands
         val adapter = ArrayAdapter(
             requireContext(),
-            android.R.layout.simple_spinner_item,
+            R.layout.spinner_item_white,
             brands
-        ).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
+        ).also { it.setDropDownViewResource(R.layout.spinner_dropdown_item_white) }
         spinner.adapter = adapter
 
         // Problem type buttons
@@ -213,9 +215,10 @@ class VehicleBookingFormFragment : Fragment(R.layout.fragment_booking_form_vehic
         dateTimeInput.setOnClickListener { openDatePicker() }
 
         // Map picker
-        view.findViewById<ImageButton>(R.id.btnPickOnMapV).setOnClickListener {
-            pickOnMapLauncher.launch(Intent(requireContext(), OsmMapPickerActivity::class.java))
-        }
+        view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnPickOnMapV)
+            .setOnClickListener {
+                pickOnMapLauncher.launch(Intent(requireContext(), OsmMapPickerActivity::class.java))
+            }
 
         // Photo
         view.findViewById<MaterialButton>(R.id.btnAddPhotoV).setOnClickListener {
@@ -231,14 +234,21 @@ class VehicleBookingFormFragment : Fragment(R.layout.fragment_booking_form_vehic
             confirmButton.isEnabled = true
 
             val whenText  = dateTimeInput.text.toString().trim()
-            val whereText = view.findViewById<TextInputEditText>(R.id.etLocationV).text.toString().trim()
+            val whereText = pickedAddress ?: ""
             val descText  = view.findViewById<TextInputEditText>(R.id.etDescriptionV).text.toString().trim()
             val brand     = spinner.selectedItem?.toString()?.takeIf { it != "Select brand…" } ?: ""
             val model     = view.findViewById<TextInputEditText>(R.id.etModel).text.toString().trim()
             val year      = view.findViewById<TextInputEditText>(R.id.etYear).text.toString().trim()
 
-            if (whenText.isBlank() || whereText.isBlank() || descText.isBlank()) {
-                Toast.makeText(requireContext(), "Please fill all required fields", Toast.LENGTH_SHORT).show()
+            if (whenText.isBlank() || descText.isBlank()) {
+                Toast.makeText(requireContext(), "Please fill in date/time and description", Toast.LENGTH_SHORT).show()
+                confirmButton.doResult(false)
+                confirmButton.postDelayed({ confirmButton.reset(); confirmButton.isEnabled = true }, 600)
+                return@setOnClickListener
+            }
+
+            if (pickedLat == null || pickedLng == null) {
+                Toast.makeText(requireContext(), "Please pick a location on the map", Toast.LENGTH_SHORT).show()
                 confirmButton.doResult(false)
                 confirmButton.postDelayed({ confirmButton.reset(); confirmButton.isEnabled = true }, 600)
                 return@setOnClickListener

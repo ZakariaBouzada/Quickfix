@@ -16,7 +16,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginBottom="4dp">
 
             <ImageButton
                 android:id="@+id/btnBackVehiclePicker"
@@ -34,49 +34,103 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:text="What needs fixing?"
+                android:text="Book a repair"
                 android:textStyle="bold"
-                android:textSize="20sp"
-                android:textColor="#FFFFFF" />
+                android:textSize="22sp"
+                android:textColor="#FFFF00" />
         </FrameLayout>
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            android:text="Select your vehicle type to get started"
-            android:textSize="13sp"
-            android:textColor="#777777"
+            android:layout_marginBottom="8dp"
+            android:text="QuickFix • On-demand repair"
+            android:textSize="12sp"
+            android:textColor="#555555"
             android:gravity="center" />
+
+        <!-- Intro card -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            app:cardCornerRadius="16dp"
+            app:cardElevation="0dp"
+            app:strokeColor="#1E1E1E"
+            app:strokeWidth="1dp"
+            app:cardBackgroundColor="#0D0D0D">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="STEP 1 OF 2"
+                    android:textColor="#FFFF00"
+                    android:textSize="10sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="0.15" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Select your vehicle type"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:text="We'll match you with a mechanic specialised in your vehicle."
+                    android:textSize="13sp"
+                    android:textColor="#777777" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Bike card -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardBike"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginBottom="14dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:clickable="true"
             android:focusable="true"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
             app:strokeColor="#2A2A2A"
             app:strokeWidth="1dp"
-            app:cardBackgroundColor="#101010"
+            app:cardBackgroundColor="#0F0F0F"
             app:rippleColor="#33FFFF00">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
-                <TextView
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
-                    android:text="🚲"
-                    android:textSize="36sp"
-                    android:gravity="center" />
+                <!-- Emoji badge -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#1A1A00">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="🚲"
+                        android:textSize="30sp"
+                        android:gravity="center" />
+                </com.google.android.material.card.MaterialCardView>
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -90,7 +144,7 @@
                         android:layout_height="wrap_content"
                         android:text="Bike"
                         android:textStyle="bold"
-                        android:textSize="18sp"
+                        android:textSize="17sp"
                         android:textColor="#FFFFFF" />
 
                     <TextView
@@ -99,15 +153,16 @@
                         android:layout_marginTop="3dp"
                         android:text="Tires, chain, brakes and more"
                         android:textSize="12sp"
-                        android:textColor="#BDBDBD" />
+                        android:textColor="#777777" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="›"
-                    android:textSize="28sp"
-                    android:textColor="#FFFF00" />
+                    android:textSize="26sp"
+                    android:textColor="#FFFF00"
+                    android:paddingStart="8dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -115,30 +170,38 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardCar"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginBottom="14dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:clickable="true"
             android:focusable="true"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
             app:strokeColor="#2A2A2A"
             app:strokeWidth="1dp"
-            app:cardBackgroundColor="#101010"
+            app:cardBackgroundColor="#0F0F0F"
             app:rippleColor="#33FFFF00">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
-                <TextView
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
-                    android:text="🚗"
-                    android:textSize="36sp"
-                    android:gravity="center" />
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#001A1A">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="🚗"
+                        android:textSize="30sp"
+                        android:gravity="center" />
+                </com.google.android.material.card.MaterialCardView>
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -152,7 +215,7 @@
                         android:layout_height="wrap_content"
                         android:text="Car"
                         android:textStyle="bold"
-                        android:textSize="18sp"
+                        android:textSize="17sp"
                         android:textColor="#FFFFFF" />
 
                     <TextView
@@ -161,15 +224,16 @@
                         android:layout_marginTop="3dp"
                         android:text="Engine, brakes, tires and more"
                         android:textSize="12sp"
-                        android:textColor="#BDBDBD" />
+                        android:textColor="#777777" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="›"
-                    android:textSize="28sp"
-                    android:textColor="#FFFF00" />
+                    android:textSize="26sp"
+                    android:textColor="#FFFF00"
+                    android:paddingStart="8dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
@@ -177,30 +241,38 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardMotorbike"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
-            android:layout_marginBottom="14dp"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="10dp"
             android:clickable="true"
             android:focusable="true"
             app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
             app:strokeColor="#2A2A2A"
             app:strokeWidth="1dp"
-            app:cardBackgroundColor="#101010"
+            app:cardBackgroundColor="#0F0F0F"
             app:rippleColor="#33FFFF00">
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal"
                 android:padding="16dp"
                 android:gravity="center_vertical">
 
-                <TextView
-                    android:layout_width="52dp"
-                    android:layout_height="52dp"
-                    android:text="🏍️"
-                    android:textSize="36sp"
-                    android:gravity="center" />
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    app:cardCornerRadius="14dp"
+                    app:cardElevation="0dp"
+                    app:cardBackgroundColor="#1A000A">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="🏍️"
+                        android:textSize="30sp"
+                        android:gravity="center" />
+                </com.google.android.material.card.MaterialCardView>
 
                 <LinearLayout
                     android:layout_width="0dp"
@@ -214,7 +286,7 @@
                         android:layout_height="wrap_content"
                         android:text="Motorbike"
                         android:textStyle="bold"
-                        android:textSize="18sp"
+                        android:textSize="17sp"
                         android:textColor="#FFFFFF" />
 
                     <TextView
@@ -223,15 +295,16 @@
                         android:layout_marginTop="3dp"
                         android:text="Engine, brakes, tires and more"
                         android:textSize="12sp"
-                        android:textColor="#BDBDBD" />
+                        android:textColor="#777777" />
                 </LinearLayout>
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="›"
-                    android:textSize="28sp"
-                    android:textColor="#FFFF00" />
+                    android:textSize="26sp"
+                    android:textColor="#FFFF00"
+                    android:paddingStart="8dp" />
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 

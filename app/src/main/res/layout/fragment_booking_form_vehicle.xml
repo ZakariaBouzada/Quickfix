@@ -4,8 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000"
-    android:fillViewport="true"
-    android:paddingBottom="16dp">
+    android:fillViewport="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -17,7 +16,7 @@
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginBottom="12dp">
+            android:layout_marginBottom="4dp">
 
             <ImageButton
                 android:id="@+id/btnBackVehicleForm"
@@ -38,110 +37,139 @@
                 android:layout_gravity="center"
                 android:text="Book a repair"
                 android:textStyle="bold"
-                android:textSize="20sp"
-                android:textColor="#FFFFFF" />
+                android:textSize="22sp"
+                android:textColor="#FFFF00" />
         </FrameLayout>
 
-        <!-- Vehicle info card -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="QuickFix • Vehicle repair"
+            android:textSize="12sp"
+            android:textColor="#555555"
+            android:gravity="center" />
+
+        <!-- ── Step 1: Vehicle details ────────────────────────────── -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            app:cardCornerRadius="14dp"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:strokeColor="#2A2A2A"
+            app:strokeColor="#1E1E1E"
             app:strokeWidth="1dp"
-            app:cardBackgroundColor="#101010">
+            app:cardBackgroundColor="#0D0D0D">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="14dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="Vehicle details"
+                    android:text="STEP 1"
+                    android:textColor="#FFFF00"
+                    android:textSize="10sp"
                     android:textStyle="bold"
-                    android:textSize="14sp"
-                    android:textColor="#FFFF00" />
+                    android:letterSpacing="0.15" />
 
-                <!-- Brand spinner -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="16dp"
+                    android:text="Vehicle details"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
+
+                <!-- Brand label -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="6dp"
                     android:text="Brand"
-                    android:textSize="12sp"
-                    android:textColor="#AAAAAA" />
+                    android:textColor="#888888"
+                    android:textSize="12sp" />
 
+                <!-- Brand spinner -->
                 <Spinner
                     android:id="@+id/spinnerBrand"
                     android:layout_width="match_parent"
-                    android:layout_height="48dp"
+                    android:layout_height="52dp"
+                    android:layout_marginBottom="14dp"
                     android:background="@drawable/spinner_bg"
-                    android:paddingStart="12dp"
-                    android:paddingEnd="12dp"
-                    android:textColor="#FFFFFF"
+                    android:paddingStart="14dp"
+                    android:paddingEnd="14dp"
                     android:popupBackground="#1A1A1A" />
 
-                <!-- Model -->
+                <!-- Model label -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
                     android:layout_marginBottom="6dp"
                     android:text="Model (optional)"
-                    android:textSize="12sp"
-                    android:textColor="#AAAAAA" />
+                    android:textColor="#888888"
+                    android:textSize="12sp" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:boxBackgroundColor="#0F0F0F"
-                    app:boxStrokeColor="#333333"
-                    app:hintTextColor="#777777"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:layout_marginBottom="14dp"
+                    app:boxBackgroundMode="filled"
+                    app:boxBackgroundColor="#141414"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:hintTextColor="#555555"
+                    app:boxStrokeColor="#2A2A2A">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etModel"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="52dp"
                         android:hint="e.g. Golf, Civic, CBR600"
                         android:textColor="#FFFFFF"
                         android:textColorHint="#555555"
-                        android:background="#0F0F0F"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
                         android:inputType="textCapWords" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Year -->
+                <!-- Year label -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
                     android:layout_marginBottom="6dp"
                     android:text="Year (optional)"
-                    android:textSize="12sp"
-                    android:textColor="#AAAAAA" />
+                    android:textColor="#888888"
+                    android:textSize="12sp" />
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:boxBackgroundColor="#0F0F0F"
-                    app:boxStrokeColor="#333333"
-                    app:hintTextColor="#777777"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    app:boxBackgroundMode="filled"
+                    app:boxBackgroundColor="#141414"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:hintTextColor="#555555"
+                    app:boxStrokeColor="#2A2A2A">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etYear"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="52dp"
                         android:hint="e.g. 2019"
                         android:textColor="#FFFFFF"
                         android:textColorHint="#555555"
-                        android:background="#0F0F0F"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
                         android:inputType="number"
                         android:maxLength="4" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -149,31 +177,41 @@
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Problem type card -->
+        <!-- ── Step 2: Problem type ───────────────────────────────── -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            app:cardCornerRadius="14dp"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:strokeColor="#2A2A2A"
+            app:strokeColor="#1E1E1E"
             app:strokeWidth="1dp"
-            app:cardBackgroundColor="#101010">
+            app:cardBackgroundColor="#0D0D0D">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="14dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="Problem type"
+                    android:text="STEP 2"
+                    android:textColor="#FFFF00"
+                    android:textSize="10sp"
                     android:textStyle="bold"
-                    android:textSize="14sp"
-                    android:textColor="#FFFF00" />
+                    android:letterSpacing="0.15" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="14dp"
+                    android:text="What is the problem?"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
 
                 <LinearLayout
                     android:layout_width="match_parent"
@@ -184,172 +222,190 @@
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnEngine"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="5dp"
                         android:text="Engine"
                         android:textAllCaps="false"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        app:cornerRadius="10dp" />
+                        app:cornerRadius="12dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnBrakes"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="5dp"
                         android:text="Brakes"
                         android:textAllCaps="false"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        app:cornerRadius="10dp" />
+                        app:cornerRadius="12dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnTiresV"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
-                        android:layout_marginEnd="4dp"
+                        android:layout_marginEnd="5dp"
                         android:text="Tires"
                         android:textAllCaps="false"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        app:cornerRadius="10dp" />
+                        app:cornerRadius="12dp" />
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnOtherV"
                         android:layout_width="0dp"
-                        android:layout_height="40dp"
+                        android:layout_height="44dp"
                         android:layout_weight="1"
-                        android:layout_marginStart="4dp"
                         android:text="Other"
                         android:textAllCaps="false"
                         android:textSize="11sp"
                         android:textStyle="bold"
-                        app:cornerRadius="10dp" />
+                        app:cornerRadius="12dp" />
                 </LinearLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Date, location, description card -->
+        <!-- ── Step 3: Booking details ───────────────────────────── -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="14dp"
-            app:cardCornerRadius="14dp"
+            android:layout_marginBottom="12dp"
+            app:cardCornerRadius="16dp"
             app:cardElevation="0dp"
-            app:strokeColor="#2A2A2A"
+            app:strokeColor="#1E1E1E"
             app:strokeWidth="1dp"
-            app:cardBackgroundColor="#101010">
+            app:cardBackgroundColor="#0D0D0D">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="14dp">
+                android:padding="16dp">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:text="Booking details"
+                    android:text="STEP 3"
+                    android:textColor="#FFFF00"
+                    android:textSize="10sp"
                     android:textStyle="bold"
-                    android:textSize="14sp"
-                    android:textColor="#FFFF00" />
+                    android:letterSpacing="0.15" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="14dp"
+                    android:text="Date, location &amp; description"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    android:textSize="16sp" />
 
                 <!-- Date/Time -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
+                    android:text="Preferred date &amp; time"
+                    android:textColor="#888888"
+                    android:textSize="12sp" />
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    app:boxBackgroundColor="#0F0F0F"
-                    app:boxStrokeColor="#333333"
-                    app:hintTextColor="#777777"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:layout_marginBottom="16dp"
+                    app:boxBackgroundMode="filled"
+                    app:boxBackgroundColor="#141414"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:hintTextColor="#555555"
+                    app:boxStrokeColor="#2A2A2A">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etDateTimeV"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Date &amp; time"
+                        android:layout_height="52dp"
+                        android:hint="Tap to pick date &amp; time"
                         android:textColor="#FFFFFF"
                         android:textColorHint="#555555"
-                        android:background="#0F0F0F"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
                         android:focusable="false"
                         android:clickable="true"
                         android:cursorVisible="false" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <!-- Location row -->
-                <LinearLayout
-                    android:layout_width="match_parent"
+                <!-- Location — map only -->
+                <TextView
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:gravity="center_vertical"
-                    android:layout_marginBottom="4dp">
+                    android:layout_marginBottom="6dp"
+                    android:text="Location"
+                    android:textColor="#888888"
+                    android:textSize="12sp" />
 
-                    <com.google.android.material.textfield.TextInputLayout
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_weight="1"
-                        android:layout_marginEnd="8dp"
-                        app:boxBackgroundColor="#0F0F0F"
-                        app:boxStrokeColor="#333333"
-                        app:hintTextColor="#777777"
-                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnPickOnMapV"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:text="📍  Pick location on map"
+                    android:textAllCaps="false"
+                    android:textColor="#000000"
+                    android:textStyle="bold"
+                    android:textSize="14sp"
+                    app:cornerRadius="12dp"
+                    app:backgroundTint="#FFFF00"
+                    app:icon="@null" />
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etLocationV"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Location"
-                            android:textColor="#FFFFFF"
-                            android:textColorHint="#555555"
-                            android:background="#0F0F0F"
-                            android:inputType="textPostalAddress" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <ImageButton
-                        android:id="@+id/btnPickOnMapV"
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
-                        android:src="@drawable/ic_map_pin"
-                        android:background="#FFFF00"
-                        android:padding="10dp"
-                        android:scaleType="centerInside"
-                        android:contentDescription="Pick on map" />
-                </LinearLayout>
-
+                <!-- Picked address display -->
                 <TextView
                     android:id="@+id/tvPickedAddressHintV"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    android:text="Tip: use the map button to pin your exact location"
-                    android:textSize="11sp"
-                    android:textColor="#666666" />
+                    android:layout_marginTop="8dp"
+                    android:layout_marginBottom="16dp"
+                    android:text="No location selected yet — tap the button above"
+                    android:textColor="#555555"
+                    android:textSize="12sp" />
 
                 <!-- Description -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="6dp"
+                    android:text="Describe the issue"
+                    android:textColor="#888888"
+                    android:textSize="12sp" />
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="10dp"
-                    app:boxBackgroundColor="#0F0F0F"
-                    app:boxStrokeColor="#333333"
-                    app:hintTextColor="#777777"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    android:layout_marginBottom="12dp"
+                    app:boxBackgroundMode="filled"
+                    app:boxBackgroundColor="#141414"
+                    app:boxCornerRadiusTopStart="12dp"
+                    app:boxCornerRadiusTopEnd="12dp"
+                    app:boxCornerRadiusBottomStart="12dp"
+                    app:boxCornerRadiusBottomEnd="12dp"
+                    app:hintTextColor="#555555"
+                    app:boxStrokeColor="#2A2A2A">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etDescriptionV"
                         android:layout_width="match_parent"
-                        android:layout_height="120dp"
-                        android:hint="Describe the issue"
+                        android:layout_height="110dp"
+                        android:hint="e.g. engine noise, brake fade, flat tyre…"
                         android:textColor="#FFFFFF"
                         android:textColorHint="#555555"
-                        android:background="#0F0F0F"
+                        android:paddingStart="14dp"
+                        android:paddingEnd="14dp"
+                        android:paddingTop="12dp"
                         android:gravity="top"
                         android:inputType="textMultiLine"
                         android:scrollbars="vertical" />
@@ -362,10 +418,11 @@
                     android:layout_height="44dp"
                     android:text="📷  Add a photo (optional)"
                     android:textAllCaps="false"
-                    android:textColor="#FFFFFF"
-                    app:cornerRadius="10dp"
-                    app:backgroundTint="#1E1E1E"
-                    app:strokeColor="#333333"
+                    android:textColor="#CCCCCC"
+                    android:textSize="13sp"
+                    app:cornerRadius="12dp"
+                    app:backgroundTint="#181818"
+                    app:strokeColor="#2A2A2A"
                     app:strokeWidth="1dp" />
 
                 <ImageView
@@ -388,7 +445,7 @@
             android:layout_marginBottom="8dp"
             app:buttonName="Confirm booking"
             app:buttonColor="#FFFF00"
-            app:buttonTextSize="14sp"
+            app:buttonTextSize="15sp"
             app:allCaps="false"
             app:succeedColor="#FFFF00"
             app:failedColor="#9C27B0" />

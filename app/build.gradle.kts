@@ -36,7 +36,7 @@ dependencies {
     implementation("com.github.flavienlaurent.discrollview:library:0.0.2@aar")
     implementation("info.hoang8f:fbutton:1.0.5")
     implementation("com.github.dmytrodanylyk:circular-progress-button:1.4")
-    implementation("org.osmdroid:osmdroid-android:6.1.18")
+    implementation("com.google.android.gms:play-services-maps:19.0.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.0")

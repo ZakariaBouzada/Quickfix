@@ -5,8 +5,10 @@
     android:layout_height="match_parent"
     android:background="#000000">
 
-    <org.osmdroid.views.MapView
-        android:id="@+id/osmMapView"
+    <!-- Google Maps fragment fills the whole screen -->
+    <fragment
+        android:id="@+id/googleMapFragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 

@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Rate the repair"
-        android:textColor="#FFFF00"
+        android:textColor="#4472C4"
         android:textStyle="bold"
         android:textSize="18sp"
         android:includeFontPadding="false" />
@@ -100,8 +100,8 @@
         android:text="Submit rating"
         android:textAllCaps="false"
         android:textStyle="bold"
-        android:textColor="#000000"
-        app:backgroundTint="#FFFF00"
+        android:textColor="#FFFFFF"
+        app:backgroundTint="#4472C4"
         app:cornerRadius="14dp" />
 
 </LinearLayout>

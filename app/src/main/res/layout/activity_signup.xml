@@ -53,7 +53,7 @@
                 android:text="Create account"
                 android:textSize="26sp"
                 android:textStyle="bold"
-                android:textColor="#FFFF00"/>
+                android:textColor="#4472C4"/>
 
             <TextView
                 android:layout_width="wrap_content"
@@ -71,7 +71,7 @@
                 app:boxCornerRadiusTopEnd="12dp"
                 app:boxCornerRadiusBottomStart="12dp"
                 app:boxCornerRadiusBottomEnd="12dp"
-                app:boxStrokeColor="#FFFF00"
+                app:boxStrokeColor="#4472C4"
                 app:hintTextColor="#BDBDBD">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -146,7 +146,7 @@
                     android:checked="true"
                     android:text="Customer"
                     android:textStyle="bold"
-                    android:textColor="#000000"
+                    android:textColor="#FFFFFF"
                     android:background="@drawable/qf_role_selected_bg"
                     android:padding="8dp"/>
 

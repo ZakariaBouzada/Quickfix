@@ -12,10 +12,15 @@ import com.google.android.material.button.MaterialButton
 
 class ActiveRequestsAdapter(
     private val onComplete: (RepairRequest) -> Unit,
-    private val onRelease: (RepairRequest) -> Unit
+    private val onRelease: (RepairRequest) -> Unit,
+    private val onShareLocation: (RepairRequest) -> Unit,
+    private val onStopSharing: (RepairRequest) -> Unit
 ) : RecyclerView.Adapter<ActiveRequestsAdapter.ViewHolder>() {
 
     private val items = mutableListOf<RepairRequest>()
+
+    /** ID of the request currently sharing location (set from fragment) */
+    var sharingRequestId: String? = null
 
     fun submitList(newItems: List<RepairRequest>) {
         items.clear()
@@ -33,7 +38,8 @@ class ActiveRequestsAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
-        holder.bind(item, onComplete, onRelease)
+        val isSharing = item.locationSharingActive || item.id == sharingRequestId
+        holder.bind(item, onComplete, onRelease, onShareLocation, onStopSharing, isSharing)
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
@@ -42,16 +48,21 @@ class ActiveRequestsAdapter(
 
         private val btnComplete: MaterialButton = itemView.findViewById(R.id.btnComplete)
         private val btnRelease: MaterialButton = itemView.findViewById(R.id.btnRelease)
+        private val btnShareLocation: MaterialButton = itemView.findViewById(R.id.btnShareLocation)
 
         fun bind(
             req: RepairRequest,
             onComplete: (RepairRequest) -> Unit,
-            onRelease: (RepairRequest) -> Unit
+            onRelease: (RepairRequest) -> Unit,
+            onShareLocation: (RepairRequest) -> Unit,
+            onStopSharing: (RepairRequest) -> Unit,
+            isSharing: Boolean
         ) {
             tvIssue.text = req.issue
 
             // QuickFix colors
-            val yellow = Color.parseColor("#FFFF00")
+            val blue = Color.parseColor("#4472C4")
+            val red = Color.parseColor("#FF4444")
             val dark = Color.parseColor("#202020")
             val white = Color.WHITE
             val black = Color.BLACK
@@ -67,23 +78,43 @@ class ActiveRequestsAdapter(
                     .ifBlank { req.customerEmail.ifBlank { "customer" } }
                 tvMeta.text = "Waiting for confirmation from $who"
             } else {
-                tvMeta.text = "$date • $loc"
+                tvMeta.text = "$date \u2022 $loc"
+            }
+
+            // ---- Share Location button (only for accepted, not completed_pending) ----
+            if (req.status == "accepted") {
+                btnShareLocation.visibility = View.VISIBLE
+
+                if (isSharing) {
+                    btnShareLocation.text = "Sharing location\u2026 Stop"
+                    btnShareLocation.setTextColor(red)
+                    btnShareLocation.strokeColor = ColorStateList.valueOf(red)
+                    btnShareLocation.backgroundTintList = ColorStateList.valueOf(dark)
+                    btnShareLocation.strokeWidth = dp(1)
+                    btnShareLocation.setOnClickListener { onStopSharing(req) }
+                } else {
+                    btnShareLocation.text = "Share my location"
+                    btnShareLocation.setTextColor(blue)
+                    btnShareLocation.strokeColor = ColorStateList.valueOf(blue)
+                    btnShareLocation.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#101010"))
+                    btnShareLocation.strokeWidth = dp(1)
+                    btnShareLocation.setOnClickListener { onShareLocation(req) }
+                }
+            } else {
+                btnShareLocation.visibility = View.GONE
             }
 
             // ---- Complete (primary) ----
-            btnComplete.text = if (isWaitingCustomer) "Waiting…" else "Repair completed"
+            btnComplete.text = if (isWaitingCustomer) "Waiting\u2026" else "Repair completed"
             btnComplete.isAllCaps = false
             btnComplete.cornerRadius = dp(12)
-            btnComplete.backgroundTintList = ColorStateList.valueOf(yellow)
-            btnComplete.setTextColor(black)
+            btnComplete.backgroundTintList = ColorStateList.valueOf(blue)
+            btnComplete.setTextColor(white)
             btnComplete.strokeWidth = 0
 
             // Disable (and visually soften) when waiting
             btnComplete.isEnabled = !isWaitingCustomer
             btnComplete.alpha = if (isWaitingCustomer) 0.55f else 1.0f
-
-            // Optional: if you prefer, hide instead of disable:
-            // btnComplete.visibility = if (isWaitingCustomer) View.GONE else View.VISIBLE
 
             // ---- Release (secondary) ----
             btnRelease.text = "Release"
@@ -91,7 +122,7 @@ class ActiveRequestsAdapter(
             btnRelease.cornerRadius = dp(12)
             btnRelease.backgroundTintList = ColorStateList.valueOf(dark)
             btnRelease.setTextColor(white)
-            btnRelease.strokeColor = ColorStateList.valueOf(yellow)
+            btnRelease.strokeColor = ColorStateList.valueOf(blue)
             btnRelease.strokeWidth = dp(1)
             btnRelease.alpha = 1.0f
             btnRelease.isEnabled = true

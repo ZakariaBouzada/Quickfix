@@ -52,14 +52,14 @@ class IncomingRequestsAdapter(
             val loc = req.location.ifBlank { "No location" }
             tvMeta.text = "$date • $loc"
 
-            val yellow = Color.parseColor("#FFFF00")
+            val blue = Color.parseColor("#4472C4")
             val dark = Color.parseColor("#202020")
 
             btnAccept.text = "Accept"
             btnAccept.isAllCaps = false
             btnAccept.cornerRadius = dp(12)
-            btnAccept.backgroundTintList = ColorStateList.valueOf(yellow)
-            btnAccept.setTextColor(Color.BLACK)
+            btnAccept.backgroundTintList = ColorStateList.valueOf(blue)
+            btnAccept.setTextColor(Color.WHITE)
             btnAccept.strokeWidth = 0
 
             btnReject.text = "Reject"
@@ -67,7 +67,7 @@ class IncomingRequestsAdapter(
             btnReject.cornerRadius = dp(12)
             btnReject.backgroundTintList = ColorStateList.valueOf(dark)
             btnReject.setTextColor(Color.WHITE)
-            btnReject.strokeColor = ColorStateList.valueOf(yellow)
+            btnReject.strokeColor = ColorStateList.valueOf(blue)
             btnReject.strokeWidth = dp(1)
 
             btnAccept.setOnClickListener { onAccept(req) }

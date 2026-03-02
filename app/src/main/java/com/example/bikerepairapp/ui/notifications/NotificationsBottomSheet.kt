@@ -160,10 +160,37 @@ class NotificationsBottomSheet : BottomSheetDialogFragment() {
                     items.add(
                         NotificationUi(
                             id = id,
-                            title = "Mechanic accepted ✅",
+                            title = "Mechanic accepted \u2705",
                             body = buildString {
                                 append(issue)
                                 if (!mechanicName.isNullOrBlank()) append("\nBy $mechanicName")
+                            },
+                            timeLabel = formatTime(t),
+                            isUnread = isUnread(t),
+                            sortTimeMillis = t.toDate().time,
+                            requestId = requestId
+                        )
+                    )
+                }
+            }
+        }
+
+        // Mechanic on the way (location sharing active)
+        val locationSharingActive = doc.getBoolean("locationSharingActive") ?: false
+        if (locationSharingActive && status == "accepted") {
+            val mechanicLocationUpdatedAt = doc.getTimestamp("mechanicLocationUpdatedAt")
+            val acceptedAt = doc.getTimestamp("acceptedAt")
+            val t = mechanicLocationUpdatedAt ?: acceptedAt
+            if (t != null) {
+                val id = "$requestId:on_the_way"
+                if (id !in dismissed) {
+                    items.add(
+                        NotificationUi(
+                            id = id,
+                            title = "Mechanic is on the way \uD83D\uDEE0\uFE0F",
+                            body = buildString {
+                                if (!mechanicName.isNullOrBlank()) append("$mechanicName is heading to you.\n")
+                                append(issue)
                             },
                             timeLabel = formatTime(t),
                             isUnread = isUnread(t),

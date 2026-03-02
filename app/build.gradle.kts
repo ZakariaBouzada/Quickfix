@@ -37,6 +37,7 @@ dependencies {
     implementation("info.hoang8f:fbutton:1.0.5")
     implementation("com.github.dmytrodanylyk:circular-progress-button:1.4")
     implementation("com.google.android.gms:play-services-maps:19.0.0")
+    implementation("com.google.android.gms:play-services-location:21.3.0")
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.2.0")

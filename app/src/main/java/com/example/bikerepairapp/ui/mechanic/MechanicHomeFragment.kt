@@ -280,7 +280,7 @@ class MechanicHomeFragment : Fragment(R.layout.fragment_mechanic_home), OnMapRea
     private fun markerColorForVehicle(vehicleType: String?): Float = when (vehicleType) {
         "Car"       -> BitmapDescriptorFactory.HUE_AZURE
         "Motorbike" -> BitmapDescriptorFactory.HUE_ORANGE
-        else        -> BitmapDescriptorFactory.HUE_YELLOW
+        else        -> BitmapDescriptorFactory.HUE_BLUE
     }
 
     override fun onDestroyView() {

@@ -53,6 +53,10 @@
             android:name=".ui.booking.OsmMapPickerActivity"
             android:exported="false" />
 
+        <activity
+            android:name=".ui.repairs.MechanicTrackingActivity"
+            android:exported="false" />
+
     </application>
 
 

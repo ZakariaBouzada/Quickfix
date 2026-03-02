@@ -23,7 +23,7 @@
             android:background="@android:color/transparent"
             android:padding="8dp"
             android:scaleType="centerInside"
-            app:tint="#FFFF00" />
+            app:tint="#4472C4" />
 
         <TextView
             android:id="@+id/tvSettingsTitle"
@@ -33,7 +33,7 @@
             android:text="Settings"
             android:textSize="24sp"
             android:textStyle="bold"
-            android:textColor="#FFFF00" />
+            android:textColor="#4472C4" />
     </FrameLayout>
 
     <!-- Content -->
@@ -56,7 +56,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Account"
-                android:textColor="#FFFF00"
+                android:textColor="#4472C4"
                 android:textStyle="bold" />
 
             <com.google.android.material.button.MaterialButton
@@ -112,7 +112,7 @@
         android:textColor="#FFFFFF"
         app:cornerRadius="14dp"
         app:backgroundTint="#191919"
-        app:strokeColor="#FFFF00"
+        app:strokeColor="#4472C4"
         app:strokeWidth="1dp" />
 
 </LinearLayout>

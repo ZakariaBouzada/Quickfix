@@ -1,5 +1,6 @@
 package com.example.bikerepairapp.ui.repairs
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageButton
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.bikerepairapp.R
 import com.example.bikerepairapp.ui.ratings.RateRepairBottomSheet
+import com.example.bikerepairapp.ui.repairs.MechanicTrackingActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
@@ -37,12 +39,18 @@ class CustomerRepairsFragment : Fragment(R.layout.fragment_customer_repairs) {
         val rv = view.findViewById<RecyclerView>(R.id.rvCustomerRepairs)
         rv.layoutManager = LinearLayoutManager(requireContext())
 
-        adapter = CustomerRepairsAdapter { row ->
-            // ✅ rating first, then the bottom sheet will close the request on submit
-            RateRepairBottomSheet
-                .newInstance(row.id)
-                .show(parentFragmentManager, "rate_repair")
-        }
+        adapter = CustomerRepairsAdapter(
+            onConfirm = { row ->
+                RateRepairBottomSheet
+                    .newInstance(row.id)
+                    .show(parentFragmentManager, "rate_repair")
+            },
+            onTrackMechanic = { row ->
+                val intent = Intent(requireContext(), MechanicTrackingActivity::class.java)
+                intent.putExtra("requestId", row.id)
+                startActivity(intent)
+            }
+        )
         rv.adapter = adapter
 
         val uid = auth.currentUser?.uid ?: return
@@ -74,7 +82,9 @@ class CustomerRepairsFragment : Fragment(R.layout.fragment_customer_repairs) {
                     val status = d.getString("status") ?: ""
                     val mechanicName = d.getString("mechanicName") ?: ""
 
-                    CustomerRepairRow(d.id, issue, date, location, status, mechanicName)
+                    val locationSharingActive = d.getBoolean("locationSharingActive") ?: false
+
+                    CustomerRepairRow(d.id, issue, date, location, status, mechanicName, locationSharingActive)
                 }
 
                 adapter.submitList(list)
@@ -89,5 +99,6 @@ data class CustomerRepairRow(
     val date: String,
     val location: String,
     val status: String,
-    val mechanicName: String
+    val mechanicName: String,
+    val locationSharingActive: Boolean = false
 )

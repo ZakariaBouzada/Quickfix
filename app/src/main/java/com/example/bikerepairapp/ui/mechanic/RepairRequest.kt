@@ -16,5 +16,9 @@ data class RepairRequest(
     val chatId: String? = null,
     // Vehicle fields (set for Car/Motorbike requests, null for legacy Bike requests)
     val vehicleType: String? = null,
-    val locationGeo: GeoPoint? = null
+    val locationGeo: GeoPoint? = null,
+    // Live location sharing fields
+    val mechanicLat: Double? = null,
+    val mechanicLng: Double? = null,
+    val locationSharingActive: Boolean = false
 )

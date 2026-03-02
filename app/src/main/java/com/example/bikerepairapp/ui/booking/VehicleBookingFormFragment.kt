@@ -146,19 +146,19 @@ class VehicleBookingFormFragment : Fragment(R.layout.fragment_booking_form_vehic
         val btnTires  = view.findViewById<MaterialButton>(R.id.btnTiresV)
         val btnOther  = view.findViewById<MaterialButton>(R.id.btnOtherV)
 
-        val yellow = Color.parseColor("#FFFF00")
+        val blue = Color.parseColor("#4472C4")
         val dark   = Color.parseColor("#202020")
 
         fun styleSelected(b: MaterialButton) {
-            b.backgroundTintList = ColorStateList.valueOf(yellow)
-            b.setTextColor(Color.BLACK)
+            b.backgroundTintList = ColorStateList.valueOf(blue)
+            b.setTextColor(Color.WHITE)
             b.strokeWidth = 0
         }
         fun styleUnselected(b: MaterialButton) {
             b.backgroundTintList = ColorStateList.valueOf(dark)
             b.setTextColor(Color.WHITE)
             b.strokeWidth = 2
-            b.strokeColor = ColorStateList.valueOf(yellow)
+            b.strokeColor = ColorStateList.valueOf(blue)
         }
         fun applyProblem(type: String) {
             selectedProblemType = type

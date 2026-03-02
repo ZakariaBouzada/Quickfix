@@ -30,7 +30,7 @@
             android:text="Repair requests"
             android:textStyle="bold"
             android:textSize="18sp"
-            android:textColor="#FFFF00" />
+            android:textColor="#4472C4" />
 
         <TextView
             android:id="@+id/tvPinCount"
@@ -61,7 +61,7 @@
             <View
                 android:layout_width="12dp"
                 android:layout_height="12dp"
-                android:background="#FFFF00" />
+                android:background="#4472C4" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -126,7 +126,7 @@
             android:src="@android:drawable/ic_input_add"
             android:background="@android:color/transparent"
             android:contentDescription="Zoom in"
-            app:tint="#FFFF00" />
+            app:tint="#4472C4" />
 
         <View
             android:layout_width="match_parent"
@@ -140,7 +140,7 @@
             android:src="@android:drawable/ic_delete"
             android:background="@android:color/transparent"
             android:contentDescription="Zoom out"
-            app:tint="#FFFF00" />
+            app:tint="#4472C4" />
     </LinearLayout>
 
     <!-- Request detail card (shown when a pin is tapped) -->
@@ -178,10 +178,10 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="🚲 Bike"
-                    android:textColor="#FFFF00"
+                    android:textColor="#4472C4"
                     android:textStyle="bold"
                     android:textSize="13sp"
-                    android:background="#1AFFFF00"
+                    android:background="#1A4472C4"
                     android:paddingStart="8dp"
                     android:paddingEnd="8dp"
                     android:paddingTop="3dp"
@@ -238,9 +238,9 @@
                 android:text="Accept request"
                 android:textAllCaps="false"
                 android:textStyle="bold"
-                android:textColor="#000000"
+                android:textColor="#FFFFFF"
                 app:cornerRadius="12dp"
-                app:backgroundTint="#FFFF00"
+                app:backgroundTint="#4472C4"
                 app:strokeWidth="0dp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>

@@ -121,15 +121,15 @@ class MechanicProfileFragment : Fragment(R.layout.fragment_mechanic_profile) {
         btnCar: MaterialButton,
         btnMoto: MaterialButton
     ) {
-        val yellow = Color.parseColor("#FFFF00")
+        val blue = Color.parseColor("#4472C4")
         val dark   = Color.parseColor("#202020")
 
         fun style(btn: MaterialButton, type: String) {
             val active = selectedPrefs.contains(type)
-            btn.backgroundTintList = ColorStateList.valueOf(if (active) yellow else dark)
-            btn.setTextColor(if (active) Color.BLACK else Color.WHITE)
+            btn.backgroundTintList = ColorStateList.valueOf(if (active) blue else dark)
+            btn.setTextColor(Color.WHITE)
             btn.strokeWidth = if (active) 0 else 2
-            btn.strokeColor = ColorStateList.valueOf(yellow)
+            btn.strokeColor = ColorStateList.valueOf(blue)
         }
 
         style(btnBike, "Bike")

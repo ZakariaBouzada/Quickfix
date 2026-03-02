@@ -13,7 +13,7 @@
         android:contentDescription="Notifications"
         android:padding="8dp"
         android:scaleType="centerInside"
-        app:tint="#FFFF00" />
+        app:tint="#4472C4" />
 
     <TextView
         android:id="@+id/tvNotifBadge"

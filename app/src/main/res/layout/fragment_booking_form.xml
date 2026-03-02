@@ -28,7 +28,7 @@
                 android:background="@android:color/transparent"
                 android:padding="8dp"
                 android:scaleType="centerInside"
-                app:tint="#FFFF00" />
+                app:tint="#4472C4" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -37,7 +37,7 @@
                 android:text="Book a repair"
                 android:textStyle="bold"
                 android:textSize="22sp"
-                android:textColor="#FFFF00" />
+                android:textColor="#4472C4" />
         </FrameLayout>
 
         <TextView
@@ -70,7 +70,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="STEP 1"
-                    android:textColor="#FFFF00"
+                    android:textColor="#4472C4"
                     android:textSize="10sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.15" />
@@ -158,7 +158,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="STEP 2"
-                    android:textColor="#FFFF00"
+                    android:textColor="#4472C4"
                     android:textSize="10sp"
                     android:textStyle="bold"
                     android:letterSpacing="0.15" />
@@ -225,11 +225,11 @@
                     android:layout_height="52dp"
                     android:text="📍  Pick location on map"
                     android:textAllCaps="false"
-                    android:textColor="#000000"
+                    android:textColor="#FFFFFF"
                     android:textStyle="bold"
                     android:textSize="14sp"
                     app:cornerRadius="12dp"
-                    app:backgroundTint="#FFFF00"
+                    app:backgroundTint="#4472C4"
                     app:icon="@null" />
 
                 <!-- Picked address display -->
@@ -324,8 +324,8 @@
             app:buttonName="Confirm booking"
             app:buttonTextSize="15sp"
             app:allCaps="false"
-            app:buttonColor="#FFFF00"
-            app:succeedColor="#FFFF00"
+            app:buttonColor="#4472C4"
+            app:succeedColor="#4472C4"
             app:failedColor="@color/quickfix_purple" />
 
         <!-- Hidden status views (kept for code compatibility) -->
@@ -368,9 +368,9 @@
             android:text="Confirm completed"
             android:textAllCaps="false"
             android:textStyle="bold"
-            android:textColor="#000000"
+            android:textColor="#FFFFFF"
             app:cornerRadius="12dp"
-            app:backgroundTint="#FFFF00"
+            app:backgroundTint="#4472C4"
             android:visibility="gone" />
 
         <View

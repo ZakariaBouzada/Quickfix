@@ -52,9 +52,9 @@
                 android:text="Accept"
                 android:textAllCaps="false"
                 android:textStyle="bold"
-                android:textColor="#000000"
+                android:textColor="#FFFFFF"
                 app:cornerRadius="12dp"
-                app:backgroundTint="#FFFF00"
+                app:backgroundTint="#4472C4"
                 app:strokeWidth="0dp"
                 app:rippleColor="#22000000" />
 
@@ -70,9 +70,9 @@
                 android:textColor="#FFFFFF"
                 app:cornerRadius="12dp"
                 app:backgroundTint="#202020"
-                app:strokeColor="#FFFF00"
+                app:strokeColor="#4472C4"
                 app:strokeWidth="1dp"
-                app:rippleColor="#22FFFF00" />
+                app:rippleColor="#224472C4" />
 
         </LinearLayout>
 

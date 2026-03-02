@@ -46,7 +46,7 @@
             android:layout_width="46dp"
             android:layout_height="46dp"
             android:layout_marginStart="10dp"
-            android:background="#FFFF00"
+            android:background="#4472C4"
             android:contentDescription="Send"
             android:src="@android:drawable/ic_menu_send"
             android:padding="10dp"/>

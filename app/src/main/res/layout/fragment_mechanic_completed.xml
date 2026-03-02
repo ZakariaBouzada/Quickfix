@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:background="#000000"
         app:title="Completed repairs"
-        app:titleTextColor="#FFFF00"
+        app:titleTextColor="#4472C4"
         app:navigationIcon="@android:drawable/ic_media_previous" />
 
     <TextView

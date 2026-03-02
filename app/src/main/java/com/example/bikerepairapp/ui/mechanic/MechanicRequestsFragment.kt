@@ -1,10 +1,14 @@
 package com.example.bikerepairapp.ui.mechanic
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.content.res.ColorStateList
 import android.graphics.Color
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -24,19 +28,33 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
     private lateinit var incomingAdapter: IncomingRequestsAdapter
     private lateinit var activeAdapter: ActiveRequestsAdapter
 
+    private var locationSharingService: LocationSharingService? = null
+
+    /** Pending request to share location for (waiting on permission result) */
+    private var pendingShareRequest: RepairRequest? = null
+
+    private val locationPermissionLauncher =
+        registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+            if (granted) {
+                pendingShareRequest?.let { startLocationSharing(it) }
+            } else {
+                Toast.makeText(requireContext(), "Location permission required to share location", Toast.LENGTH_SHORT).show()
+            }
+            pendingShareRequest = null
+        }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         db = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
+        locationSharingService = LocationSharingService(requireContext())
 
         val btnMessages = view.findViewById<android.widget.ImageButton>(R.id.btnMessages)
         btnMessages.setOnClickListener {
-            // Open your messages bottom sheet (mechanic side)
             com.example.bikerepairapp.ui.messages.MessagesBottomSheet()
                 .show(parentFragmentManager, "messages")
         }
-
 
         val rvIncoming = view.findViewById<RecyclerView>(R.id.rvIncoming)
         val rvActive = view.findViewById<RecyclerView>(R.id.rvActive)
@@ -47,12 +65,13 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
         incomingAdapter = IncomingRequestsAdapter(
             onAccept = { acceptRequest(it) },
             onReject = { rejectRequest(it) }
-
         )
 
         activeAdapter = ActiveRequestsAdapter(
             onComplete = { completeRequest(it) },
-            onRelease = { releaseRequest(it) }
+            onRelease = { releaseRequest(it) },
+            onShareLocation = { requestLocationSharing(it) },
+            onStopSharing = { stopLocationSharing(it) }
         )
 
         rvIncoming.layoutManager = LinearLayoutManager(requireContext())
@@ -65,12 +84,12 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
         fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
         fun applyTabSelection(isIncoming: Boolean) {
-            val yellow = Color.parseColor("#FFFF00")
+            val blue = Color.parseColor("#4472C4")
             val dark = Color.parseColor("#202020")
 
             fun selected(btn: MaterialButton) {
-                btn.backgroundTintList = ColorStateList.valueOf(yellow)
-                btn.setTextColor(Color.BLACK)
+                btn.backgroundTintList = ColorStateList.valueOf(blue)
+                btn.setTextColor(Color.WHITE)
                 btn.strokeWidth = 0
                 btn.isAllCaps = false
             }
@@ -78,7 +97,7 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
             fun unselected(btn: MaterialButton) {
                 btn.backgroundTintList = ColorStateList.valueOf(dark)
                 btn.setTextColor(Color.WHITE)
-                btn.strokeColor = ColorStateList.valueOf(yellow)
+                btn.strokeColor = ColorStateList.valueOf(blue)
                 btn.strokeWidth = dp(1)
                 btn.isAllCaps = false
             }
@@ -110,8 +129,48 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
         listenForActive()
     }
 
+    override fun onDestroyView() {
+        // Stop location sharing when leaving the fragment
+        locationSharingService?.stopSharing()
+        locationSharingService = null
+        super.onDestroyView()
+    }
+
+    // ---- Location sharing ----
+
+    private fun requestLocationSharing(req: RepairRequest) {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+            == PackageManager.PERMISSION_GRANTED
+        ) {
+            startLocationSharing(req)
+        } else {
+            pendingShareRequest = req
+            locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+    }
+
+    private fun startLocationSharing(req: RepairRequest) {
+        val service = locationSharingService ?: return
+        val success = service.startSharing(req.id)
+        if (success) {
+            activeAdapter.sharingRequestId = req.id
+            activeAdapter.notifyDataSetChanged()
+            Toast.makeText(requireContext(), "Sharing your location", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(requireContext(), "Could not start location sharing", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun stopLocationSharing(req: RepairRequest) {
+        locationSharingService?.stopSharing()
+        activeAdapter.sharingRequestId = null
+        activeAdapter.notifyDataSetChanged()
+        Toast.makeText(requireContext(), "Location sharing stopped", Toast.LENGTH_SHORT).show()
+    }
+
+    // ---- Existing methods ----
+
     private fun openChatForRequest(req: RepairRequest) {
-        // If request doesn't have chatId yet, tell mechanic to accept first
         if (req.chatId.isNullOrBlank()) {
             Toast.makeText(requireContext(), "Accept the request to start chat", Toast.LENGTH_SHORT).show()
             return
@@ -119,23 +178,20 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
         openChat(req.chatId!!)
     }
 
-
     private fun currentUid(): String? = auth.currentUser?.uid
 
     private fun listenForIncoming() {
         val uid = currentUid() ?: return
 
-        // Load mechanic's preferred vehicle types first, then start listening
         db.collection("users").document(uid).get()
             .addOnSuccessListener { userSnap ->
                 @Suppress("UNCHECKED_CAST")
                 val prefs = userSnap.get("preferredVehicles") as? List<String>
-                    ?: listOf("Bike", "Car", "Motorbike")  // default = show all
+                    ?: listOf("Bike", "Car", "Motorbike")
 
                 startIncomingListener(uid, prefs)
             }
             .addOnFailureListener {
-                // If we can't load prefs, show all
                 startIncomingListener(uid, listOf("Bike", "Car", "Motorbike"))
             }
     }
@@ -153,8 +209,6 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
                     val mechanicId = doc.getString("mechanicId")
                     if (!mechanicId.isNullOrBlank()) return@mapNotNull null
 
-                    // Vehicle type filter:
-                    // - if request has no vehicleType (old bike-only requests) treat it as "Bike"
                     val vehicleType = doc.getString("vehicleType") ?: "Bike"
                     if (!preferredVehicles.contains(vehicleType)) return@mapNotNull null
 
@@ -190,7 +244,6 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
                 val list = snap.documents.mapNotNull { doc ->
                     val status = doc.getString("status") ?: "accepted"
 
-                    // ✅ Active list should show accepted OR waiting-for-confirmation
                     if (status != "accepted" && status != "completed_pending") return@mapNotNull null
 
                     RepairRequest(
@@ -206,7 +259,8 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
                         customerName = doc.getString("customerName") ?: "",
                         chatId = doc.getString("chatId"),
                         vehicleType = doc.getString("vehicleType"),
-                        locationGeo = doc.getGeoPoint("locationGeo")
+                        locationGeo = doc.getGeoPoint("locationGeo"),
+                        locationSharingActive = (doc.getBoolean("locationSharingActive") ?: false)
                     )
                 }
 
@@ -216,8 +270,6 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
 
     /**
      * Accept request + ensure chat exists.
-     * - If request already has chatId -> just accept.
-     * - Else -> create chats/{id} and set requests/{id}.chatId.
      */
     private fun acceptRequest(req: RepairRequest) {
         val mechanicId = currentUid() ?: return
@@ -229,7 +281,6 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
             val reqSnap = tx.get(reqRef)
             val existingChatId = reqSnap.getString("chatId")
 
-            // Always set accepted fields
             val acceptedUpdate = mapOf(
                 "status" to "accepted",
                 "mechanicId" to mechanicId,
@@ -251,7 +302,7 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
                 "mechanicId" to mechanicId,
                 "participants" to listOf(customerId, mechanicId),
                 "createdAt" to FieldValue.serverTimestamp(),
-                "lastMessage" to "Mechanic accepted ✅",
+                "lastMessage" to "Mechanic accepted \u2705",
                 "lastMessageAt" to FieldValue.serverTimestamp(),
                 "lastSenderId" to mechanicId
             ))
@@ -259,7 +310,6 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
             tx.update(reqRef, acceptedUpdate + mapOf("chatId" to chatRef.id))
             return@runTransaction chatRef.id
         }.addOnSuccessListener { chatId ->
-            // Optional: open chat immediately after accept
             openChat(chatId)
         }.addOnFailureListener {
             Toast.makeText(requireContext(), "Failed to accept", Toast.LENGTH_SHORT).show()
@@ -270,7 +320,6 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
         ChatBottomSheet.newInstance(chatId)
             .show(parentFragmentManager, "chat")
     }
-
 
     private fun rejectRequest(req: RepairRequest) {
         val uid = currentUid() ?: return
@@ -285,7 +334,12 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
     private fun completeRequest(req: RepairRequest) {
         val uid = currentUid() ?: return
 
-        // ✅ IMPORTANT: this must match the customer listener
+        // Stop location sharing if active for this request
+        if (locationSharingService?.currentRequestId == req.id) {
+            locationSharingService?.stopSharing()
+            activeAdapter.sharingRequestId = null
+        }
+
         db.collection("requests").document(req.id)
             .update(
                 mapOf(
@@ -302,6 +356,12 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
     private fun releaseRequest(req: RepairRequest) {
         val uid = currentUid() ?: return
 
+        // Stop location sharing if active for this request
+        if (locationSharingService?.currentRequestId == req.id) {
+            locationSharingService?.stopSharing()
+            activeAdapter.sharingRequestId = null
+        }
+
         db.collection("requests").document(req.id)
             .update(
                 mapOf(
@@ -309,7 +369,12 @@ class MechanicRequestsFragment : Fragment(R.layout.fragment_mechanic_requests) {
                     "mechanicId" to null,
                     "mechanicName" to null,
                     "handledAt" to FieldValue.serverTimestamp(),
-                    "rejectedBy" to FieldValue.arrayUnion(uid)
+                    "rejectedBy" to FieldValue.arrayUnion(uid),
+                    // Clear location sharing fields
+                    "locationSharingActive" to false,
+                    "mechanicLat" to FieldValue.delete(),
+                    "mechanicLng" to FieldValue.delete(),
+                    "mechanicLocationUpdatedAt" to FieldValue.delete()
                 )
             )
             .addOnFailureListener {

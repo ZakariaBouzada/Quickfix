@@ -11,19 +11,18 @@ import com.example.bikerepairapp.R
 import com.google.android.material.button.MaterialButton
 
 class CustomerRepairsAdapter(
-    private val onConfirm: ((CustomerRepairRow) -> Unit)? = null
+    private val onConfirm: ((CustomerRepairRow) -> Unit)? = null,
+    private val onTrackMechanic: ((CustomerRepairRow) -> Unit)? = null
 ) : RecyclerView.Adapter<CustomerRepairsAdapter.VH>() {
 
     private val items = mutableListOf<CustomerRepairRow>()
 
-    // ✅ local UI state: hide confirm after user taps it (until Firestore updates to "closed")
     private val confirmClickedIds = mutableSetOf<String>()
 
     fun submitList(newItems: List<CustomerRepairRow>) {
         items.clear()
         items.addAll(newItems)
 
-        // optional cleanup so the set doesn't grow forever
         val idsNow = items.map { it.id }.toSet()
         confirmClickedIds.retainAll(idsNow)
 
@@ -42,12 +41,11 @@ class CustomerRepairsAdapter(
         holder.bind(
             row = items[position],
             onConfirm = onConfirm,
+            onTrackMechanic = onTrackMechanic,
             confirmClickedIds = confirmClickedIds
         ) { clickedId ->
-            // hide immediately
             confirmClickedIds.add(clickedId)
 
-            // ✅ compatible with older RecyclerView
             val p = holder.adapterPosition
             if (p != RecyclerView.NO_POSITION) {
                 notifyItemChanged(p)
@@ -62,32 +60,60 @@ class CustomerRepairsAdapter(
 
         private val tvStatus: TextView? = itemView.findViewById(R.id.tvStatus)
         private val btnConfirm: MaterialButton? = itemView.findViewById(R.id.btnConfirmRepair)
+        private val btnTrackMechanic: MaterialButton? = itemView.findViewById(R.id.btnTrackMechanic)
 
         fun bind(
             row: CustomerRepairRow,
             onConfirm: ((CustomerRepairRow) -> Unit)?,
+            onTrackMechanic: ((CustomerRepairRow) -> Unit)?,
             confirmClickedIds: Set<String>,
             onOptimisticHide: (String) -> Unit
         ) {
             tvIssue.text = row.issue
-            tvMeta.text = "${row.date} • ${row.location}"
+            tvMeta.text = "${row.date} \u2022 ${row.location}"
 
             val prettyStatus = when (row.status) {
                 "pending" -> "Pending"
                 "accepted" -> "Accepted"
                 "completed_pending" -> "Waiting for your confirmation"
-                "closed" -> "Closed ✅"
+                "closed" -> "Closed \u2705"
                 else -> row.status
             }
 
             val mech = row.mechanicName.takeIf { it.isNotBlank() }
             tvStatus?.text = if (mech != null && row.status != "pending") {
-                "Status: $prettyStatus • Mechanic: $mech"
+                "Status: $prettyStatus \u2022 Mechanic: $mech"
             } else {
                 "Status: $prettyStatus"
             }
 
-            // ✅ Show confirm only when completed_pending AND user hasn't clicked it already
+            // ---- Track mechanic button (visible for accepted repairs) ----
+            val canTrack = row.status == "accepted" && onTrackMechanic != null
+            btnTrackMechanic?.apply {
+                visibility = if (canTrack) View.VISIBLE else View.GONE
+
+                val blue = Color.parseColor("#4472C4")
+                val dark = Color.parseColor("#101010")
+
+                if (row.locationSharingActive) {
+                    text = "\uD83D\uDFE2 Track mechanic"
+                    setTextColor(blue)
+                    strokeColor = ColorStateList.valueOf(blue)
+                } else {
+                    text = "View mechanic location"
+                    setTextColor(blue)
+                    strokeColor = ColorStateList.valueOf(blue)
+                }
+
+                backgroundTintList = ColorStateList.valueOf(dark)
+                strokeWidth = dp(1)
+                isAllCaps = false
+                cornerRadius = dp(12)
+
+                setOnClickListener { onTrackMechanic?.invoke(row) }
+            }
+
+            // ---- Confirm repair button ----
             val canConfirm =
                 row.status == "completed_pending" &&
                         onConfirm != null &&
@@ -96,18 +122,22 @@ class CustomerRepairsAdapter(
             btnConfirm?.apply {
                 visibility = if (canConfirm) View.VISIBLE else View.GONE
 
-                val yellow = Color.parseColor("#FFFF00")
-                backgroundTintList = ColorStateList.valueOf(yellow)
-                setTextColor(Color.BLACK)
+                val blue = Color.parseColor("#4472C4")
+                backgroundTintList = ColorStateList.valueOf(blue)
+                setTextColor(Color.WHITE)
                 isAllCaps = false
                 text = "Confirm repair"
 
                 setOnClickListener {
-                    // ✅ hide instantly so it doesn't pop back while rating screen is open
                     onOptimisticHide(row.id)
                     onConfirm?.invoke(row)
                 }
             }
+        }
+
+        private fun dp(value: Int): Int {
+            val density = itemView.resources.displayMetrics.density
+            return (value * density).toInt()
         }
     }
 }

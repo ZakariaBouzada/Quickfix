@@ -23,7 +23,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Profile"
-                android:textColor="#FFFF00"
+                android:textColor="#4472C4"
                 android:textSize="26sp"
                 android:textStyle="bold" />
 
@@ -45,7 +45,7 @@
                     android:padding="9dp"
                     android:contentDescription="Settings"
                     android:src="@drawable/setting"
-                    app:tint="#FFFF00" />
+                    app:tint="#4472C4" />
             </com.google.android.material.card.MaterialCardView>
 
         </RelativeLayout>
@@ -89,7 +89,7 @@
                         app:cardBackgroundColor="#191919"
                         app:cardCornerRadius="28dp"
                         app:cardElevation="0dp"
-                        app:strokeColor="#FFFF00"
+                        app:strokeColor="#4472C4"
                         app:strokeWidth="1dp">
 
                         <ImageView
@@ -160,7 +160,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Your stats"
-                    android:textColor="#FFFF00"
+                    android:textColor="#4472C4"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -239,7 +239,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Notifications"
-                    android:textColor="#FFFF00"
+                    android:textColor="#4472C4"
                     android:textSize="14sp"
                     android:textStyle="bold" />
 
@@ -316,7 +316,7 @@
             android:textColor="#FFFFFF"
             app:cornerRadius="14dp"
             app:backgroundTint="#191919"
-            app:strokeColor="#FFFF00"
+            app:strokeColor="#4472C4"
             app:strokeWidth="1dp" />
 
         <!-- Keep for Kotlin compatibility -->
